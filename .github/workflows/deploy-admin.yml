@@ -28,7 +28,6 @@ jobs:
             cd /home/apps/BigWhale
             docker compose build --no-cache bigwhale_admin
             docker compose up -d bigwhale_admin
-
              echo "=== Cleaning up old images ==="
             docker image prune -af
             docker builder prune -f

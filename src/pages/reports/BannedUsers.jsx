@@ -26,11 +26,11 @@ const COLUMNS = [
     ),
   },
   { key: 'email', header: 'Email' },
-  { key: 'referrerUserName', header: 'Referral' },
+  // { key: 'referrerUserName', header: 'Referral' },
   {
     key: 'bannedAt',
     header: 'Banned At',
-    render: (r) => formatDateTime(r.bannedAt || r.updatedAt),
+    render: (r) => formatDateTime(r.BannedAtUtc || r.BannedAtPk),
   },
   {
     key: 'status',

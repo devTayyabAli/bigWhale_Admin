@@ -37,6 +37,8 @@ export const fetchSaleKGC = createAsyncThunk(
   }
 )
 
+// ── Report pages — these endpoints were added to the server ──────────
+
 export const fetchCashInflow = createAsyncThunk(
   'dashboard/fetchCashInflow',
   async (params, { rejectWithValue }) => {

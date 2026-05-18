@@ -102,7 +102,7 @@ export default function GiftRewards() {
     },
   ]
 
-  const totalRecords = data?.totalRecords || 0
+  const totalRecords = data?.data?.totalRecords || data?.totalRecords || 0
 
   return (
     <motion.div {...fadeInUp} className="space-y-4">
@@ -131,10 +131,10 @@ export default function GiftRewards() {
           }
         />
         <CardBody className="p-0">
-          <Table columns={columns} data={data?.giftRequest || []} loading={loading} error={error}
+          <Table columns={columns} data={data?.data?.giftRequest || data?.giftRequest || []} loading={loading} error={error}
             emptyMessage="No gift reward requests found." />
           <Pagination
-            currentPage={Number(data?.page) || params.page}
+            currentPage={Number(data?.data?.page || data?.page) || params.page}
             totalPages={Math.ceil(totalRecords / params.limit) || 1}
             totalItems={totalRecords}
             limit={params.limit}

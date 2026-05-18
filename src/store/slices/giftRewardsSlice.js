@@ -6,7 +6,7 @@ export const fetchGiftRewards = createAsyncThunk(
   'giftRewards/fetchAll',
   async (params, { rejectWithValue }) => {
     try {
-      const { data } = await api.get('/admin/gift-requests', { params })
+      const { data } = await api.get('/gift/requests', { params })
       return data
     } catch (err) {
       return rejectWithValue(err.response?.data)
@@ -18,7 +18,7 @@ export const changeGiftStatus = createAsyncThunk(
   'giftRewards/changeStatus',
   async ({ id, body, params }, { dispatch, rejectWithValue }) => {
     try {
-      const { data } = await api.put(`/admin/gift-request/${id}/status`, body)
+      const { data } = await api.put(`/gift/update/requestStatus/${id}`, body)
       toast.success(`Request ${body.status} successfully`)
       dispatch(fetchGiftRewards(params))
       return data

@@ -53,43 +53,44 @@ export default function UserDetails() {
   useEffect(() => {
     const p = { page, limit: 10 }
     const actions = {
-      Staking:         () => dispatch(fetchUserStakingList({ userId: id, params: p })),
-      Rewards:         () => dispatch(fetchUserRewards({ userId: id, params: p })),
-      Withdrawals:     () => dispatch(fetchUserWithdrawals({ userId: id, params: p })),
-      Sales:           () => dispatch(fetchUserSales({ userId: id, params: p })),
-      'Fund Transfers':() => dispatch(fetchUserFundTransfers({ userId: id, params: p })),
+      Staking: () => dispatch(fetchUserStakingList({ userId: id, params: p })),
+      Rewards: () => dispatch(fetchUserRewards({ userId: id, params: p })),
+      Withdrawals: () => dispatch(fetchUserWithdrawals({ userId: id, params: p })),
+      Sales: () => dispatch(fetchUserSales({ userId: id, params: p })),
+      'Fund Transfers': () => dispatch(fetchUserFundTransfers({ userId: id, params: p })),
     }
     actions[activeTab]?.()
   }, [dispatch, id, activeTab, page])
 
-  const user = singleUser.data?.user || singleUser.data
+  const user = singleUser.data?.data || singleUser.data?.user || singleUser.data?.data
+
 
   const tabData = useMemo(() => ({
     Staking: {
       state: staking,
       columns: [
-        { key: 'amount',    header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
-        { key: 'tokens',    header: 'BRC',                    render: (r) => roundTo(r.tokens, ROUND_OFF_TO) },
-        { key: 'status',    header: 'Status',                 render: (r) => <Badge status={r.status} /> },
-        { key: 'createdAt', header: 'Date',                   render: (r) => formatDate(r.createdAt) },
+        { key: 'amount', header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
+        { key: 'tokens', header: 'BRC', render: (r) => roundTo(r.tokens, ROUND_OFF_TO) },
+        { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
+        { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
       ],
     },
     Rewards: {
       state: rewards,
       columns: [
-        { key: 'amount',    header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
-        { key: 'type',      header: 'Type',                   render: (r) => r.type || '-' },
-        { key: 'status',    header: 'Status',                 render: (r) => <Badge status={r.status} /> },
-        { key: 'createdAt', header: 'Date',                   render: (r) => formatDate(r.createdAt) },
+        { key: 'amount', header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
+        { key: 'type', header: 'Type', render: (r) => r.type || '-' },
+        { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
+        { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
       ],
     },
     Withdrawals: {
       state: withdrawals,
       columns: [
-        { key: 'amount',        header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
-        { key: 'walletAddress', header: 'Wallet',                 render: (r) => truncateAddress(r.walletAddress) },
-        { key: 'status',        header: 'Status',                 render: (r) => <Badge status={r.status} /> },
-        { key: 'createdAt',     header: 'Date',                   render: (r) => formatDate(r.createdAt) },
+        { key: 'amount', header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
+        { key: 'walletAddress', header: 'Wallet', render: (r) => truncateAddress(r.walletAddress) },
+        { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
+        { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
         {
           key: 'action', header: 'Action',
           render: (r) => r.status === 'pending' ? (
@@ -104,25 +105,25 @@ export default function UserDetails() {
     Sales: {
       state: sales,
       columns: [
-        { key: 'tokens',    header: 'BRC',                    render: (r) => roundTo(r.tokens, ROUND_OFF_TO) },
-        { key: 'amount',    header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
-        { key: 'status',    header: 'Status',                 render: (r) => <Badge status={r.status} /> },
-        { key: 'createdAt', header: 'Date',                   render: (r) => formatDate(r.createdAt) },
+        { key: 'tokens', header: 'BW', render: (r) => roundTo(r?.transaction?.cryptoAmount, ROUND_OFF_TO) },
+        { key: 'amount', header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
+        { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
+        { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
       ],
     },
     'Fund Transfers': {
       state: fundTransfers,
       columns: [
-        { key: 'amount',    header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
-        { key: 'type',      header: 'Type',                   render: (r) => r.type || '-' },
-        { key: 'status',    header: 'Status',                 render: (r) => <Badge status={r.status} /> },
-        { key: 'createdAt', header: 'Date',                   render: (r) => formatDate(r.createdAt) },
+        { key: 'amount', header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
+        { key: 'type', header: 'Type', render: (r) => r.type || '-' },
+        { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
+        { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
       ],
     },
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [staking, rewards, withdrawals, sales, fundTransfers, dispatch, id])
 
-  const current  = tabData[activeTab]
+  const current = tabData[activeTab]
   const paginate = current?.state?.data?.paginate || {}
 
   return (
@@ -145,8 +146,16 @@ export default function UserDetails() {
               <CardBody>
                 <div className="flex items-start gap-3 sm:gap-4">
                   {/* Avatar */}
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-bw-gradient flex items-center justify-center text-white text-xl sm:text-2xl font-bold flex-shrink-0">
-                    {user?.name?.[0]?.toUpperCase() || 'U'}
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-bw-gradient flex items-center justify-center text-white text-xl sm:text-2xl font-bold flex-shrink-0 overflow-hidden">
+                    {user?.profilePicture ? (
+                      <img
+                        src={user.profilePicture}
+                        alt={user?.name || "User"}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      user?.name?.[0]?.toUpperCase() || "U"
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -156,10 +165,10 @@ export default function UserDetails() {
                     <p className="text-bw-muted text-sm">@{user?.userName || '-'}</p>
                     {/* Info grid — 1 col on mobile, 2 col on sm */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mt-3">
-                      <InfoRow icon={Mail}       label="Email"    value={user?.email} />
-                      <InfoRow icon={Phone}      label="Phone"    value={user?.phoneNumber || 'N/A'} />
-                      <InfoRow icon={CreditCard} label="Wallet"   value={truncateAddress(user?.walletAddress)} />
-                      <InfoRow icon={User}       label="Referrer" value={user?.referrerUserName || 'N/A'} />
+                      <InfoRow icon={Mail} label="Email" value={user?.email} />
+                      <InfoRow icon={Phone} label="Phone" value={user?.phoneNumber || 'N/A'} />
+                      <InfoRow icon={CreditCard} label="Wallet" value={truncateAddress(user?.walletAddress)} />
+                      <InfoRow icon={User} label="Referrer" value={user?.referredBy?.userName || 'N/A'} />
                     </div>
                   </div>
                 </div>
@@ -172,9 +181,9 @@ export default function UserDetails() {
             <Card className="h-full">
               <CardHeader title="Rank & Status" />
               <CardBody className="space-y-3">
-                <InfoRow icon={Star}   label="Rank"   value={userRank.data?.rank?.title || 'No Rank'} />
-                <InfoRow icon={Shield} label="Role"   value={user?.role || '-'} />
-                <InfoRow icon={User}   label="Joined" value={formatDate(user?.createdAt)} />
+                <InfoRow icon={Star} label="Rank" value={userRank.data?.rank?.title || 'No Rank'} />
+                <InfoRow icon={Shield} label="Role" value={user?.role || '-'} />
+                <InfoRow icon={User} label="Joined" value={formatDate(user?.createdAt)} />
               </CardBody>
             </Card>
           </motion.div>

@@ -98,6 +98,9 @@ export default function Dashboard() {
   const loading = stats.loading
   const stakePaginate = stakeRewards.data?.paginate || {}
   const salePaginate  = saleKGC.data?.paginate || {}
+  // Server field aliases
+  const stakeTotal = stakeRewards.data?.totalCount ?? stakePaginate.totalItems ?? 0
+  const saleTotal  = saleKGC.data?.totalCount ?? salePaginate.totalItems ?? 0
 
   return (
     <div className="space-y-5 sm:space-y-6">
@@ -152,11 +155,11 @@ export default function Dashboard() {
           }
         />
         <CardBody className="p-0">
-          <Table columns={STAKE_COLUMNS} data={stakeRewards.data?.data || []} loading={stakeRewards.loading} error={stakeRewards.error} />
+          <Table columns={STAKE_COLUMNS} data={stakeRewards.data?.userStakeReward || stakeRewards.data?.data || []} loading={stakeRewards.loading} error={stakeRewards.error} />
           <Pagination
             currentPage={stakePaginate.currentPage || stakePage}
             totalPages={stakePaginate.totalPages || 1}
-            totalItems={stakePaginate.totalItems || 0}
+            totalItems={stakeTotal}
             limit={params.limit}
             onPageChange={setStakePage}
           />
@@ -173,11 +176,11 @@ export default function Dashboard() {
           }
         />
         <CardBody className="p-0">
-          <Table columns={SALE_COLUMNS} data={saleKGC.data?.data || []} loading={saleKGC.loading} error={saleKGC.error} />
+          <Table columns={SALE_COLUMNS} data={saleKGC.data?.salesData || saleKGC.data?.data || []} loading={saleKGC.loading} error={saleKGC.error} />
           <Pagination
             currentPage={salePaginate.currentPage || salePage}
             totalPages={salePaginate.totalPages || 1}
-            totalItems={salePaginate.totalItems || 0}
+            totalItems={saleTotal}
             limit={params.limit}
             onPageChange={setSalePage}
           />

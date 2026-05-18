@@ -8,18 +8,20 @@ import { selectSupportDashboard, selectSupportTickets } from '@/store/selectors'
 import StatCard from '@/components/ui/StatCard'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import Table from '@/components/ui/Table'
-import Pagination from '@/components/ui/Pagination'
-import Badge from '@/components/ui/Badge'
 import Select from '@/components/ui/Select'
 import PageHeader from '@/components/ui/PageHeader'
+import Badge from '@/components/ui/Badge'
 import { formatDate } from '@/utils'
 import { staggerContainer, staggerItem, fadeInUp } from '@/animations'
 
+// Server: GET /support/counts → { data: { totalInProgressTickets, totalTODOTickets, totalCompletedTickets, allTickets } }
+// Server: GET /support/       → { data: tickets[] }  (flat array, no server-side pagination)
+
 const STATUS_OPTIONS = [
   { value: 'all',         label: 'All Status' },
-  { value: 'todo',        label: 'Todo' },
-  { value: 'in-progress', label: 'In Progress' },
-  { value: 'completed',   label: 'Completed' },
+  { value: 'ToDo',        label: 'Todo' },
+  { value: 'Pending',     label: 'In Progress' },
+  { value: 'Completed',   label: 'Completed' },
 ]
 
 const SubjectCell = memo(function SubjectCell({ id, subject }) {
@@ -35,31 +37,35 @@ const SubjectCell = memo(function SubjectCell({ id, subject }) {
 })
 
 const COLUMNS = [
-  { key: 'subject',   header: 'Subject',  render: (r) => <SubjectCell id={r._id} subject={r.subject || r.title} /> },
-  { key: 'user',      header: 'User',     render: (r) => r?.userId?.userName || r?.userName || '-' },
-  { key: 'category',  header: 'Category', render: (r) => r.category || '-' },
-  { key: 'status',    header: 'Status',   render: (r) => <Badge status={r.status} /> },
+  { key: 'subject',   header: 'Subject',  render: (r) => <SubjectCell id={r._id} subject={r.subject} /> },
+  { key: 'user',      header: 'User',     render: (r) => r?.userId?.userName || r?.userId?.name || '-' },
+  { key: 'priority',  header: 'Priority', render: (r) => r.priority || '-' },
+  { key: 'status',    header: 'Status',   render: (r) => <Badge status={r.status?.toLowerCase()} /> },
   { key: 'createdAt', header: 'Created',  render: (r) => formatDate(r.createdAt) },
 ]
 
-const INITIAL_PARAMS = { page: 1, limit: 10, status: 'all' }
 
 export default function SupportTickets() {
   const dispatch = useDispatch()
   const dashboard = useSelector(selectSupportDashboard)
   const tickets   = useSelector(selectSupportTickets)
-  const [params, setParams] = useState(INITIAL_PARAMS)
+  const [statusFilter, setStatusFilter] = useState('all')
 
   useEffect(() => { dispatch(fetchSupportDashboard()) }, [dispatch])
-  useEffect(() => { dispatch(fetchSupportTickets(params)) }, [dispatch, params])
+  useEffect(() => { dispatch(fetchSupportTickets()) }, [dispatch])
 
   const handleStatusChange = useCallback(
-    (e) => setParams((p) => ({ ...p, status: e.target.value, page: 1 })),
+    (e) => setStatusFilter(e.target.value),
     []
   )
 
-  const d       = dashboard.data?.data || {}
-  const paginate = tickets.data?.paginate || {}
+  // Server returns flat array — filter client-side
+  const allTickets = tickets.data?.data || []
+  const filtered   = statusFilter === 'all'
+    ? allTickets
+    : allTickets.filter((t) => t.status === statusFilter)
+
+  const d = dashboard.data?.data || {}
 
   const STAT_CARDS = [
     { title: 'Active Tickets', value: d.totalInProgressTickets ?? 0, icon: Briefcase, color: 'primary' },
@@ -72,7 +78,7 @@ export default function SupportTickets() {
     <motion.div {...fadeInUp} className="space-y-5 sm:space-y-6">
       <PageHeader title="Support Tickets" subtitle="Manage user support requests" />
 
-      {/* Stats — 1 col mobile, 2 col sm, 4 col xl */}
+      {/* Stats */}
       <motion.div
         variants={staggerContainer}
         initial="initial"
@@ -86,13 +92,15 @@ export default function SupportTickets() {
         ))}
       </motion.div>
 
+      {/* Table */}
       <Card>
         <CardHeader
           title="Tickets"
+          subtitle={`${filtered.length} tickets`}
           actions={
             <Select
               options={STATUS_OPTIONS}
-              value={params.status}
+              value={statusFilter}
               onChange={handleStatusChange}
               className="w-full sm:w-40"
             />
@@ -101,17 +109,10 @@ export default function SupportTickets() {
         <CardBody className="p-0">
           <Table
             columns={COLUMNS}
-            data={tickets.data?.data || []}
+            data={filtered}
             loading={tickets.loading}
             error={tickets.error}
             emptyMessage="No support tickets found."
-          />
-          <Pagination
-            currentPage={paginate.currentPage || params.page}
-            totalPages={paginate.totalPages || 1}
-            totalItems={paginate.totalItems || 0}
-            limit={params.limit}
-            onPageChange={(p) => setParams((prev) => ({ ...prev, page: p }))}
           />
         </CardBody>
       </Card>

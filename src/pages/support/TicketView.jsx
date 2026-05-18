@@ -13,7 +13,7 @@ import { SkeletonCard } from '@/components/ui/Skeleton'
 import { formatDateTime } from '@/utils'
 import { fadeInUp, staggerContainer, staggerItem } from '@/animations'
 
-const STATUS_FLOW = ['todo', 'in-progress', 'completed']
+const STATUS_FLOW = ['ToDo', 'Pending', 'Completed']
 
 export default function TicketView() {
   const { id } = useParams()
@@ -24,7 +24,7 @@ export default function TicketView() {
     dispatch(fetchTicketById(id))
   }, [dispatch, id])
 
-  const ticket = activeTicket.data?.ticket || activeTicket.data
+  const ticket = activeTicket.data?.data || activeTicket.data
 
   const handleStatusChange = (newStatus) => {
     dispatch(updateTicketStatus({ id, body: { status: newStatus }, params: {} }))

@@ -19,7 +19,7 @@ import { CURRENCY_SYMBOL, ROUND_OFF_TO } from '@/constants'
 import { formatDate, roundTo } from '@/utils'
 import { fadeInUp } from '@/animations'
 
-// Custom recharts tooltip — memoised to prevent re-render on every mouse move
+// Server response shape: { data[], totalAmount, totalCount, paginate }
 const CustomTooltip = memo(function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
   return (
@@ -33,17 +33,24 @@ const CustomTooltip = memo(function CustomTooltip({ active, payload, label }) {
 })
 
 const COLUMNS = [
-  { key: 'userName', header: 'User', render: (r) => r?.userId?.userName || r?.userName || '-' },
-  { key: 'amount', header: `Amount ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
-  { key: 'type', header: 'Type', render: (r) => r.type || '-' },
-  { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
+  {
+    key: 'user',
+    header: 'User',
+    render: (r) => r?.userId?.userName || r?.userId?.name || '-',
+  },
+  {
+    key: 'usdtAmount',
+    header: `Amount ${CURRENCY_SYMBOL}`,
+    render: (r) => roundTo(r.usdtAmount ?? r.amount, ROUND_OFF_TO),
+  },
+  { key: 'type',      header: 'Type',  render: (r) => r.type || '-' },
+  { key: 'createdAt', header: 'Date',  render: (r) => formatDate(r.createdAt) },
 ]
 
 export default memo(function GlobalTurnover() {
   const dispatch = useDispatch()
   const globalTurnover = useSelector(selectGlobalTurnover)
   const { params, setParams, setPage } = useTableParams({
-    search: 'daily',
     startDate: null,
     endDate: null,
   })
@@ -52,13 +59,13 @@ export default memo(function GlobalTurnover() {
     dispatch(fetchGlobalTurnover(params))
   }, [dispatch, params])
 
-  const d = globalTurnover.data
-  const paginate = d?.paginate || {}
+  const d         = globalTurnover.data
+  const paginate  = d?.paginate || {}
   const chartData = d?.chartData || []
 
   return (
     <motion.div {...fadeInUp} className="space-y-4">
-      <PageHeader title="Global Turnover" subtitle="Platform-wide transaction volume" />
+      <PageHeader title="Global Turnover" subtitle="Platform-wide token exchange volume" />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <StatCard
@@ -77,7 +84,7 @@ export default memo(function GlobalTurnover() {
         />
       </div>
 
-      {/* Trend chart — only rendered when data exists */}
+      {/* Trend chart — only rendered when chart data exists */}
       {chartData.length > 0 && (
         <Card>
           <CardHeader title="Turnover Trend" />
@@ -86,7 +93,7 @@ export default memo(function GlobalTurnover() {
               <AreaChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorTurnover" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#00D2FF" stopOpacity={0.3} />
+                    <stop offset="5%"  stopColor="#00D2FF" stopOpacity={0.3} />
                     <stop offset="95%" stopColor="#00D2FF" stopOpacity={0} />
                   </linearGradient>
                 </defs>
@@ -111,12 +118,12 @@ export default memo(function GlobalTurnover() {
 
       <Card>
         <CardHeader
-          title="Turnover Transactions"
+          title="Token Exchange Transactions"
           actions={
             <DateTimeFilter
               params={params}
               setParams={setParams}
-              dropdownOptions={['all', 'daily', 'weekly', 'monthly', 'date range']}
+              dropdownOptions={['all', 'date range']}
             />
           }
         />

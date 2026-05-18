@@ -12,14 +12,26 @@ import DateTimeFilter from '@/components/ui/DateTimeFilter'
 import PageHeader from '@/components/ui/PageHeader'
 import { useTableParams } from '@/hooks/useTableParams'
 import { CURRENCY_SYMBOL, ROUND_OFF_TO } from '@/constants'
-import { formatDate, roundTo } from '@/utils'
+import { formatDate, roundTo, truncateAddress } from '@/utils'
 import { fadeInUp } from '@/animations'
 
+// Server response shape: { data[], totalAmount, totalCount, paginate }
 const COLUMNS = [
-  { key: 'userName', header: 'User', render: (r) => r?.userId?.userName || r?.userName || '-' },
-  { key: 'amount', header: `Amount ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
-  { key: 'type', header: 'Type', render: (r) => r.type || '-' },
-  { key: 'walletAddress', header: 'Wallet', render: (r) => r.walletAddress ? `${r.walletAddress.slice(0, 8)}…` : '-' },
+  {
+    key: 'user',
+    header: 'User',
+    render: (r) => r?.userId?.userName || r?.userId?.name || '-',
+  },
+  {
+    key: 'amount',
+    header: `Amount ${CURRENCY_SYMBOL}`,
+    render: (r) => roundTo(r.amount, ROUND_OFF_TO),
+  },
+  {
+    key: 'walletAddress',
+    header: 'Wallet',
+    render: (r) => truncateAddress(r?.userId?.walletAddress),
+  },
   { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
 ]
 
@@ -27,7 +39,6 @@ export default memo(function CashOutflow() {
   const dispatch = useDispatch()
   const cashOutflow = useSelector(selectCashOutflow)
   const { params, setParams, setPage } = useTableParams({
-    search: 'daily',
     startDate: null,
     endDate: null,
   })
@@ -41,22 +52,33 @@ export default memo(function CashOutflow() {
 
   return (
     <motion.div {...fadeInUp} className="space-y-4">
-      <PageHeader title="Cash Outflow" subtitle="Outgoing funds overview" />
+      <PageHeader title="Cash Outflow" subtitle="Withdrawal transactions overview" />
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard title={`Total Outflow ${CURRENCY_SYMBOL}`} value={d?.totalAmount ? roundTo(d.totalAmount, ROUND_OFF_TO) : '-'} icon={TrendingDown} color="danger" loading={cashOutflow.loading} />
-        <StatCard title="Total Transactions" value={d?.totalCount ?? '-'} icon={TrendingDown} color="primary" loading={cashOutflow.loading} />
-        <StatCard title={`Average ${CURRENCY_SYMBOL}`} value={d?.avgAmount ? roundTo(d.avgAmount, ROUND_OFF_TO) : '-'} icon={TrendingDown} color="warning" loading={cashOutflow.loading} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <StatCard
+          title={`Total Outflow ${CURRENCY_SYMBOL}`}
+          value={d?.totalAmount ? roundTo(d.totalAmount, ROUND_OFF_TO) : '-'}
+          icon={TrendingDown}
+          color="danger"
+          loading={cashOutflow.loading}
+        />
+        <StatCard
+          title="Total Transactions"
+          value={d?.totalCount ?? '-'}
+          icon={TrendingDown}
+          color="primary"
+          loading={cashOutflow.loading}
+        />
       </div>
 
       <Card>
         <CardHeader
-          title="Outflow Transactions"
+          title="Withdrawal Transactions"
           actions={
             <DateTimeFilter
               params={params}
               setParams={setParams}
-              dropdownOptions={['all', 'daily', 'weekly', 'monthly', 'date range']}
+              dropdownOptions={['all', 'date range']}
             />
           }
         />

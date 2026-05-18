@@ -6,7 +6,7 @@ export const fetchSupportDashboard = createAsyncThunk(
   'support/fetchDashboard',
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await api.get('/admin/support/dashboard')
+      const { data } = await api.get('/support/counts')
       return data
     } catch (err) {
       return rejectWithValue(err.response?.data)
@@ -18,7 +18,7 @@ export const fetchSupportTickets = createAsyncThunk(
   'support/fetchTickets',
   async (params, { rejectWithValue }) => {
     try {
-      const { data } = await api.get('/admin/support/tickets', { params })
+      const { data } = await api.get('/support/', { params })
       return data
     } catch (err) {
       return rejectWithValue(err.response?.data)
@@ -30,7 +30,7 @@ export const fetchTicketById = createAsyncThunk(
   'support/fetchTicketById',
   async (id, { rejectWithValue }) => {
     try {
-      const { data } = await api.get(`/admin/support/ticket/${id}`)
+      const { data } = await api.get(`/support/tickets/${id}`)
       return data
     } catch (err) {
       return rejectWithValue(err.response?.data)
@@ -42,7 +42,7 @@ export const updateTicketStatus = createAsyncThunk(
   'support/updateStatus',
   async ({ id, body, params }, { dispatch, rejectWithValue }) => {
     try {
-      const { data } = await api.put(`/admin/support/ticket/${id}/status`, body)
+      const { data } = await api.put(`/support/${id}`, body)
       toast.success('Ticket status updated')
       dispatch(fetchSupportTickets(params))
       return data

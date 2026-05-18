@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Prevent horizontal overflow on mobile */
+    overflow-x: hidden;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #0A0F1C;
+    color: #F9FAFB;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevent horizontal scroll on mobile */
+    overflow-x: hidden;
+    /* Better tap highlight on mobile */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Custom scrollbar — desktop only */
+  @media (min-width: 768px) {
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #111827; }
+    ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #00D2FF; }
+  }
+
+  /* Improve touch targets on mobile */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Exception: icon-only small buttons inside tables/badges */
+  .touch-compact button,
+  .touch-compact [role="button"] {
+    min-height: unset;
+    min-width: unset;
+  }
+}
+
+@layer components {
+  /* ── BW Card ─────────────────────────────────────────────────────── */
+  .bw-card {
+    @apply bg-bw-card border border-bw-border rounded-2xl shadow-card backdrop-blur-sm;
+  }
+
+  /* ── BW Button Primary ───────────────────────────────────────────── */
+  .bw-btn-primary {
+    @apply bg-bw-gradient text-white font-semibold px-5 py-2.5 rounded-xl
+           hover:shadow-bw transition-all duration-200 active:scale-95
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* ── BW Button Ghost ─────────────────────────────────────────────── */
+  .bw-btn-ghost {
+    @apply border border-bw-border text-bw-text-secondary font-medium px-5 py-2.5 rounded-xl
+           hover:border-bw-primary hover:text-bw-primary transition-all duration-200;
+  }
+
+  /* ── BW Input ────────────────────────────────────────────────────── */
+  .bw-input {
+    @apply w-full bg-bw-surface border border-bw-border text-bw-text rounded-xl px-4 py-2.5
+           placeholder-bw-muted focus:outline-none focus:border-bw-primary focus:ring-1
+           focus:ring-bw-primary transition-all duration-200
+           /* Mobile: prevent zoom on focus (font-size >= 16px) */
+           text-base md:text-sm;
+  }
+
+  /* ── BW Badge ────────────────────────────────────────────────────── */
+  .bw-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap;
+  }
+
+  /* Status badges */
+  .badge-active   { @apply bw-badge bg-emerald-500/20 text-emerald-400; }
+  .badge-banned   { @apply bw-badge bg-red-500/20 text-red-400; }
+  .badge-pending  { @apply bw-badge bg-amber-500/20 text-amber-400; }
+  .badge-accepted { @apply bw-badge bg-emerald-500/20 text-emerald-400; }
+  .badge-rejected { @apply bw-badge bg-red-500/20 text-red-400; }
+
+  /* ── Glassmorphism panel ─────────────────────────────────────────── */
+  .glass-panel {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl;
+  }
+
+  /* ── Gradient text ───────────────────────────────────────────────── */
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-bw-gradient;
+  }
+
+  /* ── Sidebar nav item ────────────────────────────────────────────── */
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-bw-text-secondary
+           hover:bg-bw-surface hover:text-bw-text transition-all duration-200 cursor-pointer
+           /* Larger tap target on mobile */
+           min-h-[48px];
+  }
+  .nav-item.active {
+    @apply bg-bw-primary/10 text-bw-primary border border-bw-primary/20;
+  }
+
+  /* ── Table ───────────────────────────────────────────────────────── */
+  .bw-table {
+    @apply w-full text-sm;
+  }
+  .bw-table thead tr {
+    @apply border-b border-bw-border;
+  }
+  .bw-table thead th {
+    @apply px-3 py-3 md:px-4 text-left text-bw-muted font-medium uppercase tracking-wider text-xs
+           whitespace-nowrap;
+  }
+  .bw-table tbody tr {
+    @apply border-b border-bw-border/50 hover:bg-bw-surface/50 transition-colors duration-150;
+  }
+  .bw-table tbody td {
+    @apply px-3 py-3 md:px-4 text-bw-text-secondary;
+  }
+
+  /* ── Skeleton loader ─────────────────────────────────────────────── */
+  .skeleton {
+    @apply bg-bw-surface animate-pulse rounded-lg;
+    background: linear-gradient(90deg, #1F2937 25%, #374151 50%, #1F2937 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* ── Mobile filter row ───────────────────────────────────────────── */
+  .filter-row {
+    @apply flex flex-wrap items-end gap-2 w-full;
+  }
+
+  /* ── Card header responsive ──────────────────────────────────────── */
+  .card-header-responsive {
+    @apply flex flex-col sm:flex-row sm:items-center justify-between
+           gap-3 px-4 py-4 border-b border-bw-border;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #00D2FF 0%, #007CF0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .border-gradient {
+    border: 1px solid transparent;
+    background: linear-gradient(#111827, #111827) padding-box,
+                linear-gradient(135deg, #00D2FF, #007CF0) border-box;
+  }
+
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
+  }
+
+  /* Safe area insets for notched phones */
+  .safe-top    { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-left   { padding-left: env(safe-area-inset-left); }
+  .safe-right  { padding-right: env(safe-area-inset-right); }
+
+  /* Hide scrollbar but keep scroll */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+  /* Full-width on mobile, auto on larger */
+  .w-full-mobile { @apply w-full sm:w-auto; }
+}

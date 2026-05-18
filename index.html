@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Mobile viewport — prevents zoom, enables full-width layout -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- PWA / mobile app meta -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="BW Admin" />
+    <meta name="theme-color" content="#0A0F1C" />
+
+    <!-- SEO -->
+    <meta name="description" content="BW Admin Panel — BigWhale Crypto Dashboard" />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- Open Graph (for sharing) -->
+    <meta property="og:title" content="BW Admin Panel" />
+    <meta property="og:description" content="BigWhale Crypto Admin Dashboard" />
+    <meta property="og:type" content="website" />
+
+    <title>BW Admin Panel</title>
+
+    <!-- Google Fonts: Inter — preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Inline critical CSS to prevent flash of unstyled content -->
+    <style>
+      html, body { background-color: #0A0F1C; color: #F9FAFB; }
+      #root { min-height: 100dvh; }
+    </style>
+  </head>
+  <body class="bg-bw-dark text-bw-text">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

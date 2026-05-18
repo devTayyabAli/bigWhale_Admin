@@ -1,0 +1,18 @@
+{
+  "name": "BW Admin Panel",
+  "short_name": "BW Admin",
+  "description": "BigWhale Crypto Admin Dashboard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0F1C",
+  "theme_color": "#0A0F1C",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

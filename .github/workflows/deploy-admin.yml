@@ -18,18 +18,18 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
 
           script: |
-            set -e
+  set -e
 
-            echo "=== Pulling latest code ==="
-            cd /home/apps/BigWhale/bigWhale_Admin
-            git pull origin main
+  echo "=== Pulling latest code ==="
+  cd /home/apps/BigWhale/bigWhale_Admin
+  git pull origin main
 
-            echo "=== Building and restarting container ==="
-            cd /home/apps/BigWhale
-            docker compose build --no-cache bigwhale_admin
-            docker compose up -d bigwhale_admin
-             echo "=== Cleaning up old images ==="
-            docker image prune -af
-            docker builder prune -f
+  echo "=== Building and restarting containers ==="
+  cd /home/apps/BigWhale
+  docker compose up -d --build
 
-            echo "=== Admin deployed successfully at $(date) ==="
+  echo "=== Cleaning up ==="
+  docker image prune -af
+  docker builder prune -f
+
+  echo "=== Deployment successful ==="

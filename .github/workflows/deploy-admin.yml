@@ -21,21 +21,15 @@ jobs:
             set -e
 
             echo "=== Pulling latest code ==="
-
             cd /home/apps/BigWhale/bigWhale_Admin
-
-            git fetch origin
-            git reset --hard origin/main
+            git pull origin main
 
             echo "=== Building and restarting container ==="
-
             cd /home/apps/BigWhale
-
             docker compose build --no-cache bigwhale_admin
             docker compose up -d bigwhale_admin
 
-            echo "=== Cleaning up old images ==="
-
+             echo "=== Cleaning up old images ==="
             docker image prune -af
             docker builder prune -f
 

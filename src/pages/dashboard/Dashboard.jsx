@@ -25,15 +25,15 @@ import { staggerContainer, staggerItem } from '@/animations'
 
 const STAKE_COLUMNS = [
   { key: 'userName', header: 'User', render: (r) => r?.userId?.userName || r?.userName || '-' },
-  { key: 'amount', header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.amount, ROUND_OFF_TO) },
+  { key: 'amount', header: `Amount ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.stakeAmount, ROUND_OFF_TO) },
   { key: 'status', header: 'Status', render: (r) => <Badge status={r?.status} /> },
-  { key: 'createdAt', header: 'Date', render: (r) => formatDate(r?.createdAt) },
+  { key: 'createdAt', header: 'Date', render: (r) => formatDate(r?.date) },
 ]
 
 const SALE_COLUMNS = [
   { key: 'userName', header: 'User', render: (r) => r?.userId?.userName || r?.userName || '-' },
-  { key: 'tokens', header: 'BRC', render: (r) => roundTo(r?.tokens, ROUND_OFF_TO) },
-  { key: 'amount', header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.amount, ROUND_OFF_TO) },
+  { key: 'tokens', header: 'BW', render: (r) => roundTo(r?.tokens, ROUND_OFF_TO) },
+  { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.amount, ROUND_OFF_TO) },
   { key: 'status', header: 'Status', render: (r) => <Badge status={r?.status} /> },
   { key: 'createdAt', header: 'Date', render: (r) => formatDate(r?.createdAt) },
 ]
@@ -102,6 +102,7 @@ export default function Dashboard() {
   const stakeTotal = stakeRewards.data?.totalCount ?? stakePaginate.totalItems ?? 0
   const saleTotal  = saleKGC.data?.totalCount ?? salePaginate.totalItems ?? 0
 
+  
   return (
     <div className="space-y-5 sm:space-y-6">
       {/* Header + filter — stack on mobile */}
@@ -170,7 +171,7 @@ export default function Dashboard() {
       <Card>
         <CardHeader
           title="Token Sales"
-          subtitle={`${params.search === 'daily' ? "Today's" : ''} BRC token sales`}
+          subtitle={`${params.search === 'daily' ? "Today's" : ''} BW token sales`}
           actions={
             <SearchInput value={saleSearch} onChange={handleSaleSearch} placeholder="Search username…" />
           }

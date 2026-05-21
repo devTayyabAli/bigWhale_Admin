@@ -39,12 +39,16 @@ const COLUMNS = [
     render: (r) => r?.userId?.userName || r?.userId?.name || '-',
   },
   {
-    key: 'usdtAmount',
-    header: `Amount ${CURRENCY_SYMBOL}`,
-    render: (r) => roundTo(r.usdtAmount ?? r.amount, ROUND_OFF_TO),
+    key: 'amount',
+    header: `Staked Amount ${CURRENCY_SYMBOL}`,
+    render: (r) => roundTo(r.amount, ROUND_OFF_TO),
   },
-  { key: 'type',      header: 'Type',  render: (r) => r.type || '-' },
-  { key: 'createdAt', header: 'Date',  render: (r) => formatDate(r.createdAt) },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (r) => r.status || '-',
+  },
+  { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
 ]
 
 export default memo(function GlobalTurnover() {
@@ -65,7 +69,7 @@ export default memo(function GlobalTurnover() {
 
   return (
     <motion.div {...fadeInUp} className="space-y-4">
-      <PageHeader title="Global Turnover" subtitle="Platform-wide token exchange volume" />
+      <PageHeader title="Global Turnover" subtitle="Platform-wide total active staked value" />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <StatCard
@@ -76,7 +80,7 @@ export default memo(function GlobalTurnover() {
           loading={globalTurnover.loading}
         />
         <StatCard
-          title="Total Transactions"
+          title="Total Stakes"
           value={d?.totalCount ?? '-'}
           icon={RefreshCcw}
           color="primary"
@@ -118,7 +122,7 @@ export default memo(function GlobalTurnover() {
 
       <Card>
         <CardHeader
-          title="Token Exchange Transactions"
+          title="Active Stakes"
           actions={
             <DateTimeFilter
               params={params}

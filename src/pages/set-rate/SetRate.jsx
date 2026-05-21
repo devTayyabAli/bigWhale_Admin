@@ -81,7 +81,7 @@ export default function SetRate() {
 
   return (
     <motion.div {...fadeInUp} className="space-y-4">
-      <PageHeader title="Set Rate" subtitle="Update the BRC token price" />
+      <PageHeader title="Set Rate" subtitle="Update the BW token price" />
 
       {/* Full width on mobile, constrained on sm+ */}
       <div className="w-full sm:max-w-md">
@@ -95,17 +95,17 @@ export default function SetRate() {
             {currentRate !== null && (
               <div className="flex items-center justify-between p-3 rounded-xl bg-bw-surface border border-bw-border">
                 <span className="text-sm text-bw-muted">Current Rate</span>
-                <span className="text-bw-primary font-bold text-sm">{currentRate} BRC / $1</span>
+                <span className="text-bw-primary font-bold text-sm">{currentRate} BW / $1</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
               <Input
-                label="New Rate (BRC Tokens per $1)"
+                label="New Rate (BW Tokens per $1)"
                 type="number"
                 inputMode="decimal"
                 step="any"
-                placeholder="Enter BRC token amount"
+                placeholder="Enter BW token amount"
                 error={errors.amount?.message}
                 disabled={loading}
                 {...register('amount')}

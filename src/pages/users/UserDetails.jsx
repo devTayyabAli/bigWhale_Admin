@@ -69,8 +69,8 @@ export default function UserDetails() {
     Staking: {
       state: staking,
       columns: [
-        { key: 'amount', header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
-        { key: 'tokens', header: 'BRC', render: (r) => roundTo(r.tokens, ROUND_OFF_TO) },
+        { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
+        { key: 'tokens', header: 'BW', render: (r) => roundTo(r?.transactionId?.cryptoAmount, ROUND_OFF_TO) },
         { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
         { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
       ],
@@ -78,7 +78,7 @@ export default function UserDetails() {
     Rewards: {
       state: rewards,
       columns: [
-        { key: 'amount', header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
+        { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
         { key: 'type', header: 'Type', render: (r) => r.type || '-' },
         { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
         { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
@@ -87,7 +87,7 @@ export default function UserDetails() {
     Withdrawals: {
       state: withdrawals,
       columns: [
-        { key: 'amount', header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
+        { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
         { key: 'walletAddress', header: 'Wallet', render: (r) => truncateAddress(r.walletAddress) },
         { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
         { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
@@ -106,7 +106,7 @@ export default function UserDetails() {
       state: sales,
       columns: [
         { key: 'tokens', header: 'BW', render: (r) => roundTo(r?.transaction?.cryptoAmount, ROUND_OFF_TO) },
-        { key: 'amount', header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
+        { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
         { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
         { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
       ],
@@ -114,7 +114,7 @@ export default function UserDetails() {
     'Fund Transfers': {
       state: fundTransfers,
       columns: [
-        { key: 'amount', header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
+        { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
         { key: 'type', header: 'Type', render: (r) => r.type || '-' },
         { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
         { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
@@ -126,6 +126,7 @@ export default function UserDetails() {
   const current = tabData[activeTab]
   const paginate = current?.state?.data?.paginate || {}
 
+  
   return (
     <div className="space-y-4 sm:space-y-6">
       <PageHeader title="User Details" backPath="/users/all-users" />

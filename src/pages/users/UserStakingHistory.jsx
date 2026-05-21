@@ -33,8 +33,8 @@ export default memo(function UserStakingHistory() {
   }, [dispatch, selectedStake])
 
   const stakeColumns = [
-    { key: 'amount',    header: `Amt ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
-    { key: 'tokens',    header: 'BRC',                    render: (r) => roundTo(r.tokens, ROUND_OFF_TO) },
+    { key: 'amount',    header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
+    { key: 'tokens',    header: 'BW',                     render: (r) => roundTo(r.tokens, ROUND_OFF_TO) },
     { key: 'status',    header: 'Status',                 render: (r) => <Badge status={r.status} /> },
     { key: 'createdAt', header: 'Date',                   render: (r) => formatDate(r.createdAt) },
     {

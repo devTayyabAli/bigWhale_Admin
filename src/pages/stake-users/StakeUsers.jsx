@@ -128,8 +128,8 @@ export default function StakeUsers() {
 
               {/* KGC preview */}
               <div className="flex items-center justify-between p-3 rounded-xl bg-bw-surface border border-bw-border">
-                <span className="text-sm text-bw-muted">BRC Tokens</span>
-                <span className="text-bw-primary font-bold text-sm">{kgcTokens ?? 0} BRC</span>
+                <span className="text-sm text-bw-muted">BW Tokens</span>
+                <span className="text-bw-primary font-bold text-sm">{kgcTokens ?? 0} BW</span>
               </div>
 
               {/* User autocomplete */}

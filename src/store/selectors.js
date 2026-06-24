@@ -38,6 +38,7 @@ export const selectSaleKGC = createSelector(selectDashboard, (d) => d.saleKGC)
 export const selectCashInflow = createSelector(selectDashboard, (d) => d.cashInflow)
 export const selectCashOutflow = createSelector(selectDashboard, (d) => d.cashOutflow)
 export const selectGlobalTurnover = createSelector(selectDashboard, (d) => d.globalTurnover)
+export const selectSalaryRankHistory = createSelector(selectDashboard, (d) => d.salaryRankHistory)
 
 // ─── Gift Rewards ─────────────────────────────────────────────────────────────
 export const selectGiftRewards = (s) => s.giftRewards
@@ -47,3 +48,9 @@ export const selectSupport = (s) => s.support
 export const selectSupportDashboard = createSelector(selectSupport, (s) => s.dashboard)
 export const selectSupportTickets = createSelector(selectSupport, (s) => s.tickets)
 export const selectActiveTicket = createSelector(selectSupport, (s) => s.activeTicket)
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+export const selectNotifications = (s) => s.notifications
+export const selectNotificationItems = createSelector(selectNotifications, (n) => n.items)
+export const selectNotificationUnreadCount = createSelector(selectNotifications, (n) => n.unreadCount)
+export const selectNotificationsLoading = createSelector(selectNotifications, (n) => n.loading)

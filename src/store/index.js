@@ -5,6 +5,7 @@ import usersReducer from './slices/usersSlice'
 import dashboardReducer from './slices/dashboardSlice'
 import giftRewardsReducer from './slices/giftRewardsSlice'
 import supportReducer from './slices/supportSlice'
+import notificationsReducer from './slices/notificationsSlice'
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     dashboard: dashboardReducer,
     giftRewards: giftRewardsReducer,
     support: supportReducer,
+    notifications: notificationsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -75,6 +75,18 @@ export const fetchGlobalTurnover = createAsyncThunk(
   }
 )
 
+export const fetchSalaryRankHistory = createAsyncThunk(
+  'dashboard/fetchSalaryRankHistory',
+  async (params, { rejectWithValue }) => {
+    try {
+      const { data } = await api.get('/admin/salary-rank-history', { params })
+      return data
+    } catch (err) {
+      return rejectWithValue(err.response?.data)
+    }
+  }
+)
+
 const asyncState = () => ({ loading: false, data: null, error: null })
 
 const dashboardSlice = createSlice({
@@ -86,6 +98,7 @@ const dashboardSlice = createSlice({
     cashInflow: asyncState(),
     cashOutflow: asyncState(),
     globalTurnover: asyncState(),
+    salaryRankHistory: asyncState(),
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -108,6 +121,7 @@ const dashboardSlice = createSlice({
     addAsync(fetchCashInflow, 'cashInflow')
     addAsync(fetchCashOutflow, 'cashOutflow')
     addAsync(fetchGlobalTurnover, 'globalTurnover')
+    addAsync(fetchSalaryRankHistory, 'salaryRankHistory')
   },
 })
 

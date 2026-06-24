@@ -20,22 +20,21 @@ import Table from '@/components/ui/Table'
 import Pagination from '@/components/ui/Pagination'
 import Badge from '@/components/ui/Badge'
 import { CURRENCY_SYMBOL, ROUND_OFF_TO } from '@/constants'
-import { formatDate, roundTo } from '@/utils'
+import { formatDate, formatDateTime, roundTo } from '@/utils'
 import { staggerContainer, staggerItem } from '@/animations'
 
 const STAKE_COLUMNS = [
   { key: 'userName', header: 'User', render: (r) => r?.userId?.userName || r?.userName || '-' },
-  { key: 'amount', header: `Amount ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.stakeAmount, ROUND_OFF_TO) },
+  { key: 'rewardAmount', header: `Reward ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.rewardAmount, ROUND_OFF_TO) },
+  { key: 'stakeAmount', header: `Stake ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.stakeAmount, ROUND_OFF_TO) },
   { key: 'status', header: 'Status', render: (r) => <Badge status={r?.status} /> },
-  { key: 'createdAt', header: 'Date', render: (r) => formatDate(r?.date) },
+  { key: 'createdAt', header: 'Date', render: (r) => formatDateTime(r?.date) },
 ]
 
 const SALE_COLUMNS = [
-  { key: 'userName', header: 'User', render: (r) => r?.userId?.userName || r?.userName || '-' },
-  { key: 'tokens', header: 'BW', render: (r) => roundTo(r?.tokens, ROUND_OFF_TO) },
-  { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.amount, ROUND_OFF_TO) },
-  { key: 'status', header: 'Status', render: (r) => <Badge status={r?.status} /> },
-  { key: 'createdAt', header: 'Date', render: (r) => formatDate(r?.createdAt) },
+  { key: 'userName', header: 'User', render: (r) => r?.userName || '-' },
+  { key: 'totalSaleAmount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.totalSaleAmount, ROUND_OFF_TO) },
+  { key: 'createdAt', header: 'Date', render: (r) => formatDateTime(r?.createdAtDubai || r?.createdAtUtc) },
 ]
 
 const SearchInput = memo(function SearchInput({ value, onChange, placeholder }) {

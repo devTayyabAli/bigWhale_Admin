@@ -67,6 +67,7 @@ export const NAV_ITEMS = [
       { id: 'cash-inflow', title: 'Cash Inflow', icon: 'TrendingUp', path: '/cash-inflow' },
       { id: 'cash-outflow', title: 'Cash Outflow', icon: 'TrendingDown', path: '/cash-outflow' },
       { id: 'global-turnover', title: 'Global Turnover', icon: 'RefreshCcw', path: '/global-turnover' },
+      { id: 'salary-rank-history', title: 'Salary Rank History', icon: 'Award', path: '/salary-rank-history' },
     ],
   },
   {
@@ -98,5 +99,11 @@ export const NAV_ITEMS = [
     title: 'Support',
     icon: 'MessageSquare',
     path: '/support-history',
+  },
+  {
+    id: 'whatsapp-settings',
+    title: 'WhatsApp Settings',
+    icon: 'MessageCircle',
+    path: '/whatsapp-settings',
   },
 ]

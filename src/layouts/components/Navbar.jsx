@@ -1,12 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { Menu, Sun, Moon, Bell, LogOut, User, ChevronDown } from 'react-feather'
+import { Menu, Sun, Moon, LogOut, User, ChevronDown } from 'react-feather'
 import { useState, useRef, useEffect, useCallback, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toggleSidebar, toggleTheme, toggleMobileSidebar } from '@/store/slices/customizerSlice'
 import { logout } from '@/store/slices/authSlice'
 import { selectTheme, selectUser } from '@/store/selectors'
 import { scaleIn } from '@/animations'
+import NotificationBell from '@/components/NotificationBell'
 
 const UserAvatar = memo(function UserAvatar({ name }) {
   return (
@@ -86,13 +87,7 @@ export default memo(function Navbar() {
         </button>
 
         {/* Notifications */}
-        <button
-          className="relative p-2 rounded-lg text-bw-muted hover:text-bw-text hover:bg-bw-surface transition-colors"
-          aria-label="Notifications"
-        >
-          <Bell size={18} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-bw-primary rounded-full" aria-hidden="true" />
-        </button>
+        <NotificationBell />
 
         {/* User dropdown */}
         <div className="relative" ref={dropdownRef}>

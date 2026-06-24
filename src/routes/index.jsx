@@ -20,12 +20,14 @@ const BannedUsers    = lazy(() => import('@/pages/reports/BannedUsers'))
 const CashInflow     = lazy(() => import('@/pages/reports/CashInflow'))
 const CashOutflow    = lazy(() => import('@/pages/reports/CashOutflow'))
 const GlobalTurnover = lazy(() => import('@/pages/reports/GlobalTurnover'))
+const SalaryRankHistory = lazy(() => import('@/pages/reports/SalaryRankHistory'))
 const SetRate        = lazy(() => import('@/pages/set-rate/SetRate'))
 const StakeUsers     = lazy(() => import('@/pages/stake-users/StakeUsers'))
 const Banner         = lazy(() => import('@/pages/banner/Banner'))
-const SupportTickets = lazy(() => import('@/pages/support/SupportTickets'))
-const TicketView     = lazy(() => import('@/pages/support/TicketView'))
-const NotFound       = lazy(() => import('@/pages/misc/NotFound'))
+const SupportTickets   = lazy(() => import('@/pages/support/SupportTickets'))
+const TicketView       = lazy(() => import('@/pages/support/TicketView'))
+const WhatsAppSettings = lazy(() => import('@/pages/whatsapp-settings/WhatsAppSettings'))
+const NotFound         = lazy(() => import('@/pages/misc/NotFound'))
 
 // ─── Route tree ───────────────────────────────────────────────────────────────
 export default function AppRoutes() {
@@ -66,6 +68,7 @@ export default function AppRoutes() {
           <Route path="/cash-inflow" element={<CashInflow />} />
           <Route path="/cash-outflow" element={<CashOutflow />} />
           <Route path="/global-turnover" element={<GlobalTurnover />} />
+          <Route path="/salary-rank-history" element={<SalaryRankHistory />} />
 
           {/* Web3 */}
           <Route path="/set-rate" element={<SetRate />} />
@@ -74,6 +77,9 @@ export default function AppRoutes() {
           {/* Support */}
           <Route path="/support-history" element={<SupportTickets />} />
           <Route path="/support/ticket-details/:id" element={<TicketView />} />
+
+          {/* Settings */}
+          <Route path="/whatsapp-settings" element={<WhatsAppSettings />} />
         </Route>
 
         {/* 404 */}

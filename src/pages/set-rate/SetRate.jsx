@@ -5,11 +5,12 @@ import * as yup from 'yup'
 import { motion } from 'framer-motion'
 import { Sliders, AlertCircle } from 'react-feather'
 import toast from 'react-hot-toast'
+import { useWalletClient } from 'wagmi'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import PageHeader from '@/components/ui/PageHeader'
-import { useWeb3 } from '@/hooks/useWeb3'
+import { useWallet } from '@/context/WalletProvider'
 import { fetchRate, setRate } from '@/services/setRate'
 import { fadeInUp } from '@/animations'
 
@@ -22,11 +23,14 @@ const schema = yup.object({
 })
 
 export default function SetRate() {
-  const { validateChain, ensureAdminWallet } = useWeb3()
+  const { validateChain, ensureAdminWallet } = useWallet()
+  // wagmi v2: walletClient exposes the EIP-1193 transport for web3.js
+  const { data: walletClient } = useWalletClient()
+
   const [currentRate, setCurrentRate] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading]         = useState(false)
   const [walletError, setWalletError] = useState(false)
-  const [contractFn, setContractFn] = useState(null)
+  const [contractFn, setContractFn]   = useState(null)
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
@@ -39,35 +43,42 @@ export default function SetRate() {
       .catch(() => {})
   }, [])
 
+  // Fetch current rate on mount
   useEffect(() => {
     fetchRate()
       .then(({ data }) => {
-        if (data?.amount) {
-          setCurrentRate(data.amount)
-          setValue('amount', data.amount)
+        // Server returns { success, data: { amount, ... } }
+        const amount = data?.data?.amount
+        if (amount) {
+          setCurrentRate(amount)
+          setValue('amount', amount)
         }
       })
       .catch(() => {})
   }, [setValue])
 
   const onSubmit = async ({ amount }) => {
+    setLoading(true)
     try {
-      const chainOk = await validateChain()
-      if (!chainOk) return
+      if (!validateChain()) return
 
       const wallet = await ensureAdminWallet()
       if (!wallet) { setWalletError(true); return }
       setWalletError(false)
-      setLoading(true)
 
-      if (contractFn) {
-        const tx = await contractFn(amount)
+      // Pass the EIP-1193 provider from the wagmi walletClient to web3.js
+      // walletClient is null when no wallet is connected
+      const provider = walletClient ?? window?.ethereum ?? null
+
+      if (contractFn && provider) {
+        const tx = await contractFn(amount, provider)
         if (tx?.status && tx?.transactionHash) {
-          await setRate({ amount: Number(amount) })
+          await setRate({ amount: Number(amount), txHash: tx.transactionHash })
           setCurrentRate(amount)
           toast.success('Token rate updated successfully')
         }
       } else {
+        // Fallback: persist to DB only (no on-chain tx)
         await setRate({ amount: Number(amount) })
         setCurrentRate(amount)
         toast.success('Rate updated successfully')
@@ -83,7 +94,6 @@ export default function SetRate() {
     <motion.div {...fadeInUp} className="space-y-4">
       <PageHeader title="Set Rate" subtitle="Update the BW token price" />
 
-      {/* Full width on mobile, constrained on sm+ */}
       <div className="w-full sm:max-w-md">
         <Card>
           <CardHeader
@@ -91,7 +101,7 @@ export default function SetRate() {
             actions={<Sliders size={16} className="text-bw-primary" />}
           />
           <CardBody className="space-y-5">
-            {/* Current rate display */}
+
             {currentRate !== null && (
               <div className="flex items-center justify-between p-3 rounded-xl bg-bw-surface border border-bw-border">
                 <span className="text-sm text-bw-muted">Current Rate</span>

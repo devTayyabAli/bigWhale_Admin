@@ -8,6 +8,7 @@ import { logout } from '@/store/slices/authSlice'
 import { selectTheme, selectUser } from '@/store/selectors'
 import { scaleIn } from '@/animations'
 import NotificationBell from '@/components/NotificationBell'
+import WalletConnectButton from '@/components/ui/WalletConnectButton'
 
 const UserAvatar = memo(function UserAvatar({ name }) {
   return (
@@ -88,6 +89,9 @@ export default memo(function Navbar() {
 
         {/* Notifications */}
         <NotificationBell />
+
+        {/* Wallet connect */}
+        <WalletConnectButton />
 
         {/* User dropdown */}
         <div className="relative" ref={dropdownRef}>

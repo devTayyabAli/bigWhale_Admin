@@ -1,15 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
 import { TrendingUp, AlertCircle, Info } from 'react-feather'
 import toast from 'react-hot-toast'
+import { useWalletClient } from 'wagmi'
 import { fetchAllUsers } from '@/store/slices/usersSlice'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import PageHeader from '@/components/ui/PageHeader'
-import { useWeb3 } from '@/hooks/useWeb3'
-import { stakeKGC, stakeKGCOnTransaction, completeStake } from '@/services/staking'
+import { useWallet } from '@/context/WalletProvider'
+import { stakeKGC, completeStake, activateStake } from '@/services/staking'
 import { STAKE_MIN, STAKE_MAX } from '@/constants'
 import { useDebounce } from '@/hooks/useDebounce'
 import { fadeInUp } from '@/animations'
@@ -17,38 +18,56 @@ import { fadeInUp } from '@/animations'
 export default function StakeUsers() {
   const dispatch = useDispatch()
   const { allUsers } = useSelector((s) => s.users)
-  const { validateChain, ensureAdminWallet } = useWeb3()
+  const { validateChain, ensureAdminWallet } = useWallet()
 
-  const [amount, setAmount] = useState('')
-  const [kgcTokens, setKgcTokens] = useState(0)
+  // Get the EIP-1193 provider directly from the wagmi wallet client.
+  // This uses the wallet connected via Reown AppKit (MetaMask, WC, etc.)
+  // and avoids window.ethereum which can be hijacked by Phantom / other extensions.
+  const { data: walletClient } = useWalletClient()
+
+  const [amount, setAmount]             = useState('')
+  const [bwPrice, setBwPrice]           = useState(0)
+  const [priceLoading, setPriceLoading] = useState(true)
   const [selectedUser, setSelectedUser] = useState(null)
-  const [userSearch, setUserSearch] = useState('')
+  const [userSearch, setUserSearch]     = useState('')
   const [showDropdown, setShowDropdown] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [walletError, setWalletError] = useState(false)
-  const [amountError, setAmountError] = useState('')
-  const [contractFns, setContractFns] = useState({ fetchKGCTokens: null, stakeTokens: null })
+  const [loading, setLoading]           = useState(false)
+  const [walletError, setWalletError]   = useState(false)
+  const [amountError, setAmountError]   = useState('')
+  const [stakeTokensFn, setStakeTokensFn] = useState(null)
 
   const debouncedSearch = useDebounce(userSearch, 300)
 
-  // Lazy-load contract helpers
+  // Lazy-load stakeTokens contract helper
   useEffect(() => {
     import('@/contract/staking')
-      .then((mod) => setContractFns({ fetchKGCTokens: mod.fetchKGCTokens, stakeTokens: mod.stakeTokens }))
+      .then((mod) => setStakeTokensFn(() => mod.stakeTokens))
       .catch(() => {})
   }, [])
+
+  // Fetch BW price from contract once on mount
+  useEffect(() => {
+    setPriceLoading(true)
+    import('@/contract/staking')
+      .then((mod) => mod.fetchBWPrice())
+      .then((price) => setBwPrice(price))
+      .catch((err) => { console.error('[StakeUsers] fetchBWPrice failed:', err); setBwPrice(0) })
+      .finally(() => setPriceLoading(false))
+  }, [])
+
+  // BW tokens = usdAmount / pricePerToken  (pure local math, instant)
+  const bwTokens = (() => {
+    const usd   = parseFloat(amount)
+    const price = parseFloat(bwPrice)
+    if (!usd || !price || price === 0) return 0
+    return usd / price
+  })()
 
   useEffect(() => {
     dispatch(fetchAllUsers({ page: 1, limit: 40, search: debouncedSearch || null, status: 'active' }))
   }, [dispatch, debouncedSearch])
 
-  useEffect(() => {
-    if (!amount || !contractFns.fetchKGCTokens) { setKgcTokens(0); return }
-    contractFns.fetchKGCTokens(amount).then(setKgcTokens).catch(() => setKgcTokens(0))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount, contractFns.fetchKGCTokens])
-
-  const handleAmountChange = (e) => {
+  const handleAmountChange = useCallback((e) => {
     const val = e.target.value
     if (val !== '' && parseFloat(val) > STAKE_MAX) {
       setAmountError(`Maximum is $${STAKE_MAX.toLocaleString()}`)
@@ -56,44 +75,73 @@ export default function StakeUsers() {
       setAmountError('')
     }
     setAmount(val)
-  }
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (parseFloat(amount) < STAKE_MIN) { setAmountError(`Minimum stake is $${STAKE_MIN}`); return }
     if (!selectedUser) { toast.error('Please select a user'); return }
+    if (!walletClient) { toast.error('Please connect your wallet first'); return }
 
     try {
-      const chainOk = await validateChain()
-      if (!chainOk) return
+      if (!validateChain()) return
 
       const wallet = await ensureAdminWallet()
       if (!wallet) { setWalletError(true); return }
       setWalletError(false)
       setLoading(true)
 
-      const stakeData = await stakeKGC({ userId: selectedUser._id, amount: Number(kgcTokens) })
+      // Create pending stake record — stake.amount = USDT fiat value
+      // (used by the reward cron to calculate daily rewards)
+      const stakeRes = await stakeKGC({ userId: selectedUser._id, amount: Number(amount) })
+      const stakeId  = stakeRes?.data?.data?._id
 
-      if (contractFns.stakeTokens) {
-        await contractFns.stakeTokens(
-          selectedUser.walletAddress, kgcTokens, stakeData,
+      if (stakeTokensFn) {
+        // Track txHash so onComplete can also call activateStake
+        let savedTxHash = null
+
+        // Pass walletClient as the EIP-1193 provider — avoids window.ethereum
+        // and ensures Phantom/other non-EVM extensions don't intercept the call
+        await stakeTokensFn(
+          selectedUser.walletAddress,
+          bwTokens,
+          stakeId,
           async (txHash) => {
-            await stakeKGCOnTransaction({
-              id: stakeData?.data?._id,
-              data: { userId: selectedUser._id, txHash, fiatAmount: Number(amount), cryptoAmount: Number(kgcTokens) },
+            // 1. Save txHash: store transaction details, sets stake.transactionId
+            savedTxHash = txHash
+            await completeStake({
+              id: stakeId,
+              data: {
+                userId:       selectedUser._id,
+                txHash,
+                fiatAmount:   Number(amount),
+                cryptoAmount: Number(bwTokens),
+              },
             })
           },
-          async (receipt) => {
-            await completeStake(receipt?.transactionHash)
+          async () => {
+            // 2. On receipt: activate — sets Transaction→completed, Stake→active
+            //    triggers instant bonus for referrer via handleStakeEvent
+            if (savedTxHash) {
+              try {
+                await activateStake(savedTxHash)
+              } catch (activateErr) {
+                console.warn('[StakeUsers] activateStake failed:', activateErr?.message)
+              }
+            }
             setLoading(false)
             toast.success('Stake completed successfully')
-            setAmount(''); setSelectedUser(null); setUserSearch('')
-          }
+            setAmount('')
+            setSelectedUser(null)
+            setUserSearch('')
+          },
+          walletClient, // ← explicit provider, bypasses window.ethereum
         )
       } else {
         setLoading(false)
         toast.success('Stake record created')
-        setAmount(''); setSelectedUser(null)
+        setAmount('')
+        setSelectedUser(null)
       }
     } catch (err) {
       setLoading(false)
@@ -107,12 +155,12 @@ export default function StakeUsers() {
     <motion.div {...fadeInUp} className="space-y-4">
       <PageHeader title="Stake Users" subtitle="Manually stake tokens for a user" />
 
-      {/* Full width on mobile, constrained on sm+ */}
       <div className="w-full sm:max-w-lg">
         <Card>
           <CardHeader title="New Stake" actions={<TrendingUp size={16} className="text-bw-primary" />} />
           <CardBody>
             <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+
               {/* Amount */}
               <Input
                 label="Stake Amount ($)"
@@ -126,10 +174,25 @@ export default function StakeUsers() {
                 disabled={loading}
               />
 
-              {/* KGC preview */}
+              {/* BW tokens preview — computed from contract price */}
               <div className="flex items-center justify-between p-3 rounded-xl bg-bw-surface border border-bw-border">
-                <span className="text-sm text-bw-muted">BW Tokens</span>
-                <span className="text-bw-primary font-bold text-sm">{kgcTokens ?? 0} BW</span>
+                <div className="flex flex-col">
+                  <span className="text-sm text-bw-muted">BW Tokens</span>
+                  {!priceLoading && bwPrice > 0 && (
+                    <span className="text-xs text-bw-muted mt-0.5">
+                      1 BW = ${bwPrice} USDT
+                    </span>
+                  )}
+                </div>
+                <span className="text-bw-primary font-bold text-sm">
+                  {priceLoading ? (
+                    <span className="text-bw-muted text-xs animate-pulse">Loading price…</span>
+                  ) : bwPrice === 0 ? (
+                    <span className="text-red-400 text-xs">Price unavailable</span>
+                  ) : (
+                    `${bwTokens > 0 ? Number(bwTokens).toFixed(4) : '0.0000'} BW`
+                  )}
+                </span>
               </div>
 
               {/* User autocomplete */}
@@ -180,7 +243,7 @@ export default function StakeUsers() {
                 type="submit"
                 fullWidth
                 loading={loading}
-                disabled={!Number(kgcTokens) || !selectedUser || Boolean(amountError)}
+                disabled={!amount || parseFloat(amount) < STAKE_MIN || Boolean(amountError) || !selectedUser}
               >
                 {loading ? 'Processing…' : 'Stake Now'}
               </Button>

@@ -69,10 +69,11 @@ export default function UserDetails() {
     Staking: {
       state: staking,
       columns: [
-        { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
-        { key: 'tokens', header: 'BW', render: (r) => roundTo(r?.transactionId?.cryptoAmount, ROUND_OFF_TO) },
-        { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
-        { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
+        // stake.amount = USDT fiat; transactionId.cryptoAmount = BW tokens
+        { key: 'fiat',   header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount ?? 0, ROUND_OFF_TO) },
+        { key: 'tokens', header: 'BW',                      render: (r) => roundTo(r?.transactionId?.cryptoAmount ?? 0, ROUND_OFF_TO) },
+        { key: 'status', header: 'Status',                  render: (r) => <Badge status={r.status} /> },
+        { key: 'createdAt', header: 'Date',                 render: (r) => formatDate(r.createdAt) },
       ],
     },
     Rewards: {

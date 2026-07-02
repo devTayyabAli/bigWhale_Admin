@@ -34,10 +34,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-redux': ['@reduxjs/toolkit', 'react-redux'],
-          'vendor-motion': ['framer-motion'],
-          'vendor-charts': ['recharts'],
+          'vendor-react':   ['react', 'react-dom', 'react-router-dom'],
+          'vendor-redux':   ['@reduxjs/toolkit', 'react-redux'],
+          'vendor-motion':  ['framer-motion'],
+          'vendor-charts':  ['recharts'],
+          'vendor-wagmi':   ['wagmi', 'viem'],
+          'vendor-appkit':  ['@reown/appkit', '@reown/appkit-adapter-wagmi'],
         },
       },
     },

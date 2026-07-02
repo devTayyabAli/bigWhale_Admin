@@ -1,12 +1,27 @@
 import api from './api'
 
-/** Create a staking record before the on-chain transaction */
-export const stakeKGC = (payload) => api.post('/admin/stake', payload)
+/**
+ * Create a pending stake record before the on-chain transaction.
+ * POST /stake
+ * Body: { userId, amount }
+ */
+export const stakeKGC = (payload) => api.post('/stake', payload)
 
-/** Update staking record with tx hash (called from onTransactionHash callback) */
-export const stakeKGCOnTransaction = ({ id, data }) =>
-  api.put(`/admin/stake/${id}/transaction`, data)
+/**
+ * After the on-chain tx hash is received, save transaction details.
+ * POST /stake/complete/:id
+ * Body: { userId, txHash, fiatAmount, cryptoAmount }
+ */
+export const completeStake = ({ id, data }) =>
+  api.post(`/stake/complete/${id}`, data)
 
-/** Mark staking as complete after receipt */
-export const completeStake = (txHash) =>
-  api.put('/admin/stake/complete', { txHash })
+/**
+ * After the on-chain tx is confirmed (receipt), activate the stake.
+ * Calls handleStakeEvent on the server which:
+ *   - Sets Transaction.status → "completed"
+ *   - Sets Stake.status      → "active"
+ *   - Triggers instant bonus for referrer
+ * POST /transaction/stake/:txHash
+ */
+export const activateStake = (txHash) =>
+  api.post(`/transaction/stake/${txHash}`)

@@ -8,6 +8,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
   plugins: [react()],
   resolve: {
+    // Force a single copy of React across all packages (wagmi, appkit, etc.)
+    // Without this, nested node_modules can bundle their own React copy which
+    // causes "Cannot read properties of undefined (reading 'createContext')".
+    dedupe: ['react', 'react-dom', 'wagmi', 'viem', '@wagmi/core'],
     alias: {
       // Stub out @wagmi/core/tempo — removed in @wagmi/core v2.22+ but still
       // referenced by the @wagmi/connectors bundled inside appkit-adapter-wagmi.

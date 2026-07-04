@@ -9,6 +9,10 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      // Stub out @wagmi/core/tempo — removed in @wagmi/core v2.22+ but still
+      // referenced by the @wagmi/connectors bundled inside appkit-adapter-wagmi.
+      // tempoWallet is unused in this project so a no-op stub is safe.
+      '@wagmi/core/tempo': path.resolve(__dirname, './src/stubs/wagmi-core-tempo.js'),
       '@': path.resolve(__dirname, './src'),
       '@components': path.resolve(__dirname, './src/components'),
       '@pages': path.resolve(__dirname, './src/pages'),

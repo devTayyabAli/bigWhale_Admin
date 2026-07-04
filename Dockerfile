@@ -1,4 +1,3 @@
-  GNU nano 6.2                                                         Dockerfile
 # Build stage
 FROM node:20-alpine AS builder
 
@@ -16,7 +15,7 @@ FROM nginx:alpine
 # Copy built files from builder
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy custom nginx config (optional, for SPA routing)
+# Copy custom nginx config for SPA routing
 RUN echo 'server { \
     listen 3000; \
     location / { \

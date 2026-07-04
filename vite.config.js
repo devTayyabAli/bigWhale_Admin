@@ -40,16 +40,10 @@ export default defineConfig({
     sourcemap: false,
     chunkSizeWarningLimit: 1500,
     rollupOptions: {
-      output: {
-        manualChunks: {
-          'vendor-react':   ['react', 'react-dom', 'react-router-dom'],
-          'vendor-redux':   ['@reduxjs/toolkit', 'react-redux'],
-          'vendor-motion':  ['framer-motion'],
-          'vendor-charts':  ['recharts'],
-          'vendor-wagmi':   ['wagmi', 'viem'],
-          'vendor-appkit':  ['@reown/appkit', '@reown/appkit-adapter-wagmi'],
-        },
-      },
+      // No manualChunks — let Rollup decide boundaries automatically.
+      // Manual splitting of wagmi/appkit/redux caused React to be imported
+      // from the wrong chunk (vendor-redux), making W.createContext undefined
+      // at runtime when chunks load out of order.
     },
   },
 })

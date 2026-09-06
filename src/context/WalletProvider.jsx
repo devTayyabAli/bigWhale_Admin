@@ -39,16 +39,8 @@ function WalletContextProvider({ children }) {
   const normalizedAddress = address?.toLowerCase() ?? null
   const isAdmin = !!normalizedAddress && normalizedAddress === ADMIN_WALLET
 
-  // ── AUTO-DISCONNECT non-admin wallets ────────────────────────────────────
-  // If a wallet connects and it's NOT the admin wallet, disconnect immediately.
-  useEffect(() => {
-    if (isConnected && normalizedAddress && !isAdmin) {
-      wagmiDisconnect()
-      toast.error(
-        `Only the admin wallet is allowed: ${ADMIN_WALLET.slice(0, 6)}…${ADMIN_WALLET.slice(-4)}`
-      )
-    }
-  }, [isConnected, normalizedAddress, isAdmin, wagmiDisconnect])
+  // Note: Owner restriction is enforced only on the Token Approval page,
+  // allowing any connected wallet address to browse and view data across the Admin Panel.
 
   // ── Open AppKit modal to connect ─────────────────────────────────────────
   const connect = useCallback(async () => {

@@ -21,7 +21,7 @@ import Button from '@/components/ui/Button'
 import PageHeader from '@/components/ui/PageHeader'
 import { SkeletonCard } from '@/components/ui/Skeleton'
 import { CURRENCY_SYMBOL, ROUND_OFF_TO } from '@/constants'
-import { formatDate, roundTo, truncateAddress } from '@/utils'
+import { formatDate, roundTo, truncateAddress, formatRewardType } from '@/utils'
 import { staggerContainer, staggerItem } from '@/animations'
 
 const TABS = ['Staking', 'Rewards', 'Withdrawals', 'Sales', 'Fund Transfers']
@@ -70,31 +70,31 @@ export default function UserDetails() {
       state: staking,
       columns: [
         // stake.amount = USDT fiat; transactionId.cryptoAmount = BW tokens
-        { key: 'fiat',   header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount ?? 0, ROUND_OFF_TO) },
-        { key: 'tokens', header: 'BW',                      render: (r) => roundTo(r?.transactionId?.cryptoAmount ?? 0, ROUND_OFF_TO) },
-        { key: 'status', header: 'Status',                  render: (r) => <Badge status={r.status} /> },
-        { key: 'createdAt', header: 'Date',                 render: (r) => formatDate(r.createdAt) },
+        { key: 'fiat',   header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.amount ?? 0, ROUND_OFF_TO) },
+        { key: 'tokens', header: 'BW',                      render: (r) => roundTo(r?.transactionId?.cryptoAmount ?? r?.cryptoAmount ?? 0, ROUND_OFF_TO) },
+        { key: 'status', header: 'Status',                  render: (r) => <Badge status={r?.status || 'Active'} /> },
+        { key: 'createdAt', header: 'Date',                 render: (r) => formatDate(r?.createdAt || r?.date) },
       ],
     },
     Rewards: {
       state: rewards,
       columns: [
-        { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
-        { key: 'type', header: 'Type', render: (r) => r.type || '-' },
-        { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
-        { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
+        { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.amount ?? r?.rewardAmount ?? r?.reward ?? 0, ROUND_OFF_TO) },
+        { key: 'type',   header: 'Type',                    render: (r) => formatRewardType(r?.type || r?.rewardType || r?.incomeType || r?.category || r?.title) },
+        { key: 'status', header: 'Status',                  render: (r) => <Badge status={r?.status || r?.rewardStatus || r?.claimStatus || 'Completed'} /> },
+        { key: 'createdAt', header: 'Date',                 render: (r) => formatDate(r?.createdAt || r?.date) },
       ],
     },
     Withdrawals: {
       state: withdrawals,
       columns: [
-        { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
-        { key: 'walletAddress', header: 'Wallet', render: (r) => truncateAddress(r.walletAddress) },
-        { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
-        { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
+        { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.amount ?? r?.withdrawAmount ?? 0, ROUND_OFF_TO) },
+        { key: 'walletAddress', header: 'Wallet',           render: (r) => truncateAddress(r?.walletAddress || r?.address) },
+        { key: 'status', header: 'Status',                  render: (r) => <Badge status={r?.status || 'Pending'} /> },
+        { key: 'createdAt', header: 'Date',                 render: (r) => formatDate(r?.createdAt || r?.date) },
         {
           key: 'action', header: 'Action',
-          render: (r) => r.status === 'pending' ? (
+          render: (r) => (r?.status?.toLowerCase() === 'pending' || !r?.status) ? (
             <Button size="xs" variant="success"
               onClick={() => dispatch(updateWithdrawStatus({ id: r._id, body: { status: 'approved' } }))}>
               Approve
@@ -106,19 +106,19 @@ export default function UserDetails() {
     Sales: {
       state: sales,
       columns: [
-        { key: 'tokens', header: 'BW', render: (r) => roundTo(r?.transaction?.cryptoAmount, ROUND_OFF_TO) },
-        { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
-        { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
-        { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
+        { key: 'tokens', header: 'BW',                      render: (r) => roundTo(r?.transaction?.cryptoAmount ?? r?.tokenAmount ?? r?.tokens ?? 0, ROUND_OFF_TO) },
+        { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.amount ?? r?.totalSaleAmount ?? 0, ROUND_OFF_TO) },
+        { key: 'status', header: 'Status',                  render: (r) => <Badge status={r?.status || 'Completed'} /> },
+        { key: 'createdAt', header: 'Date',                 render: (r) => formatDate(r?.createdAt || r?.createdAtDubai || r?.date) },
       ],
     },
     'Fund Transfers': {
       state: fundTransfers,
       columns: [
-        { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r.amount, ROUND_OFF_TO) },
-        { key: 'type', header: 'Type', render: (r) => r.type || '-' },
-        { key: 'status', header: 'Status', render: (r) => <Badge status={r.status} /> },
-        { key: 'createdAt', header: 'Date', render: (r) => formatDate(r.createdAt) },
+        { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.amount ?? r?.transferAmount ?? 0, ROUND_OFF_TO) },
+        { key: 'type',   header: 'Type',                    render: (r) => formatRewardType(r?.type || r?.transferType || 'Fund Transfer') },
+        { key: 'status', header: 'Status',                  render: (r) => <Badge status={r?.status || 'Completed'} /> },
+        { key: 'createdAt', header: 'Date',                 render: (r) => formatDate(r?.createdAt || r?.date) },
       ],
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

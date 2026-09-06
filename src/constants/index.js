@@ -83,6 +83,12 @@ export const NAV_ITEMS = [
     path: '/stake-users',
   },
   {
+    id: 'token-approval',
+    title: 'Token Approve',
+    icon: 'CheckCircle',
+    path: '/token-approval',
+  },
+  {
     id: 'accounts-details',
     title: 'Accounts Details',
     icon: 'FileText',

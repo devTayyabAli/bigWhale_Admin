@@ -23,6 +23,7 @@ const GlobalTurnover = lazy(() => import('@/pages/reports/GlobalTurnover'))
 const SalaryRankHistory = lazy(() => import('@/pages/reports/SalaryRankHistory'))
 const SetRate        = lazy(() => import('@/pages/set-rate/SetRate'))
 const StakeUsers     = lazy(() => import('@/pages/stake-users/StakeUsers'))
+const TokenApproval  = lazy(() => import('@/pages/token-approval/TokenApproval'))
 const Banner         = lazy(() => import('@/pages/banner/Banner'))
 const SupportTickets   = lazy(() => import('@/pages/support/SupportTickets'))
 const TicketView       = lazy(() => import('@/pages/support/TicketView'))
@@ -73,6 +74,7 @@ export default function AppRoutes() {
           {/* Web3 */}
           <Route path="/set-rate" element={<SetRate />} />
           <Route path="/stake-users" element={<StakeUsers />} />
+          <Route path="/token-approval" element={<TokenApproval />} />
 
           {/* Support */}
           <Route path="/support-history" element={<SupportTickets />} />

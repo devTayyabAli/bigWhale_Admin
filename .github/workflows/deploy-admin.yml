@@ -25,9 +25,9 @@ jobs:
               git checkout -- .
               git pull origin main
 
-               echo "=== Building and restarting containers ==="
+              echo "=== Building and restarting containers ==="
               cd /home/apps/BigWhale
-              docker compose up -d --build
+              docker compose up -d --build bigwhale-admin
 
               echo "=== Cleaning up ==="
               docker image prune -af

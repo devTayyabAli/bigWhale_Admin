@@ -89,6 +89,12 @@ export const NAV_ITEMS = [
     path: '/token-approval',
   },
   {
+    id: 'contract-settings',
+    title: 'Contract Settings',
+    icon: 'Sliders',
+    path: '/contract-settings',
+  },
+  {
     id: 'accounts-details',
     title: 'Accounts Details',
     icon: 'FileText',

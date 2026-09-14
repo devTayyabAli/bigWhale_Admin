@@ -1003,5 +1003,31 @@
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_registerationFee",
+                "type": "uint256"
+            }
+        ],
+        "name": "setRegisterationFee",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_registrationFee",
+                "type": "uint256"
+            }
+        ],
+        "name": "setRegistrationFee",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     }
 ]

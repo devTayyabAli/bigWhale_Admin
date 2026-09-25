@@ -20,6 +20,7 @@ import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import PageHeader from '@/components/ui/PageHeader'
+import OwnerWalletCard from './OwnerWalletCard'
 import { useWallet } from '@/context/WalletProvider'
 import { fadeInUp } from '@/animations'
 import {
@@ -613,6 +614,9 @@ export default function ContractSettings() {
           </CardBody>
         </Card>
       </div>
+
+      {/* Owner Private Key Management Section */}
+      <OwnerWalletCard />
     </motion.div>
   )
 }

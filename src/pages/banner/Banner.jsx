@@ -15,12 +15,18 @@ import { formatDate } from '@/utils'
 import { fadeInUp, staggerContainer, staggerItem } from '@/animations'
 
 const BannerCard = memo(function BannerCard({ banner, onDelete }) {
+  const bannerImage =
+    banner.image ||
+    banner.imageUrl ||
+    (Array.isArray(banner.picture) ? banner.picture[0]?.url : banner.picture?.url || banner.picture)
+  const bannerTitle = banner.title || banner.picture?.[0]?.name || 'Banner'
+
   return (
     <motion.div variants={staggerItem} className="bw-card overflow-hidden group">
       <div className="relative">
         <img
-          src={banner.image || banner.imageUrl}
-          alt={banner.title}
+          src={bannerImage}
+          alt={bannerTitle}
           loading="lazy"
           className="w-full h-36 sm:h-40 object-cover"
           onError={(e) => { e.target.src = 'https://placehold.co/400x160/111827/6B7280?text=Banner' }}
@@ -31,7 +37,7 @@ const BannerCard = memo(function BannerCard({ banner, onDelete }) {
           <button
             onClick={() => onDelete(banner)}
             className="p-2 rounded-xl bg-red-500/80 text-white hover:bg-red-500 transition-colors"
-            aria-label={`Delete ${banner.title}`}
+            aria-label={`Delete ${bannerTitle}`}
           >
             <Trash2 size={16} />
           </button>
@@ -40,13 +46,13 @@ const BannerCard = memo(function BannerCard({ banner, onDelete }) {
         <button
           onClick={() => onDelete(banner)}
           className="absolute top-2 right-2 sm:hidden p-1.5 rounded-lg bg-red-500/80 text-white"
-          aria-label={`Delete ${banner.title}`}
+          aria-label={`Delete ${bannerTitle}`}
         >
           <Trash2 size={14} />
         </button>
       </div>
       <div className="p-3">
-        <p className="text-sm font-medium text-bw-text truncate">{banner.title}</p>
+        <p className="text-sm font-medium text-bw-text truncate">{bannerTitle}</p>
         <p className="text-xs text-bw-muted mt-0.5">{formatDate(banner.createdAt)}</p>
       </div>
     </motion.div>
@@ -83,14 +89,20 @@ export default function Banner() {
     if (!title.trim()) { toast.error('Please enter a title'); return }
 
     const formData = new FormData()
+    // Append both field names for 100% compatibility with backend Multer
+    formData.append('mediaFiles', file)
     formData.append('image', file)
     formData.append('title', title)
 
     setUploading(true)
-    await dispatch(addBanner(formData))
+    const res = await dispatch(addBanner(formData))
     setUploading(false)
-    setTitle(''); setFile(null); setPreview(null)
-    dispatch(fetchBanners())
+    if (res?.meta?.requestStatus === 'fulfilled') {
+      setTitle('')
+      setFile(null)
+      setPreview(null)
+      dispatch(fetchBanners())
+    }
   }, [file, title, dispatch])
 
   const handleDelete = useCallback(() => {

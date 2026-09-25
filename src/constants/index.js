@@ -95,6 +95,12 @@ export const NAV_ITEMS = [
     path: '/contract-settings',
   },
   {
+    id: 'owner-wallet',
+    title: 'Owner Wallet',
+    icon: 'Key',
+    path: '/owner-wallet',
+  },
+  {
     id: 'accounts-details',
     title: 'Accounts Details',
     icon: 'FileText',

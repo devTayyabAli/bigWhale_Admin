@@ -232,10 +232,11 @@ export const addBanner = createAsyncThunk(
       const { data } = await api.post('/admin/banner/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
-      if (data?.success) toast.success('News Banner updated successfully')
+      if (data?.success) toast.success(data?.message || 'News Banner saved successfully')
       return data
     } catch (err) {
-      toast.error('Error while adding news banner')
+      const msg = err?.response?.data?.message || err?.message || 'Error while adding news banner'
+      toast.error(msg)
       return rejectWithValue(err.response?.data)
     }
   }

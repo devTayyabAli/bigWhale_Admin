@@ -89,9 +89,7 @@ export default function Banner() {
     if (!title.trim()) { toast.error('Please enter a title'); return }
 
     const formData = new FormData()
-    // Append both field names for 100% compatibility with backend Multer
     formData.append('mediaFiles', file)
-    formData.append('image', file)
     formData.append('title', title)
 
     setUploading(true)

@@ -28,13 +28,13 @@ const STAKE_COLUMNS = [
   { key: 'rewardAmount', header: `Reward ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.rewardAmount, ROUND_OFF_TO) },
   { key: 'stakeAmount', header: `Stake ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.stakeAmount, ROUND_OFF_TO) },
   { key: 'status', header: 'Status', render: (r) => <Badge status={r?.status} /> },
-  { key: 'createdAt', header: 'Date', render: (r) => formatDateTime(r?.date) },
+  { key: 'createdAt', header: 'Date', render: (r) => formatDateTime(r?.date || r?.createdAt) },
 ]
 
 const SALE_COLUMNS = [
-  { key: 'userName', header: 'User', render: (r) => r?.userName || '-' },
+  { key: 'userName', header: 'User', render: (r) => r?.userId?.userName || r?.userName || '-' },
   { key: 'totalSaleAmount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.totalSaleAmount, ROUND_OFF_TO) },
-  { key: 'createdAt', header: 'Date', render: (r) => formatDateTime(r?.createdAtDubai || r?.createdAtUtc) },
+  { key: 'createdAt', header: 'Date', render: (r) => formatDateTime(r?.createdAtDubai || r?.createdAtUtc || r?.createdAt) },
 ]
 
 const SearchInput = memo(function SearchInput({ value, onChange, placeholder }) {
@@ -64,15 +64,27 @@ export default function Dashboard() {
   const [stakePage, setStakePage] = useState(1)
   const [salePage, setSalePage] = useState(1)
 
+  // Reset pagination when filter criteria change
   useEffect(() => {
+    setStakePage(1)
+    setSalePage(1)
+  }, [params.search, params.startDate, params.endDate])
+
+  useEffect(() => {
+    if (params.search === 'date range' && (!params.startDate || !params.endDate)) {
+      return
+    }
     dispatch(fetchDashboardStats({
-      search: params.search,
+      search: params.search === 'date range' ? null : params.search,
       startDate: params.startDate,
       endDate: params.endDate,
     }))
   }, [dispatch, params.search, params.startDate, params.endDate])
 
   useEffect(() => {
+    if (params.search === 'date range' && (!params.startDate || !params.endDate)) {
+      return
+    }
     dispatch(fetchStakeRewards({
       ...params,
       search: params.search === 'date range' ? null : params.search,
@@ -82,6 +94,9 @@ export default function Dashboard() {
   }, [dispatch, params, stakeSearch, stakePage])
 
   useEffect(() => {
+    if (params.search === 'date range' && (!params.startDate || !params.endDate)) {
+      return
+    }
     dispatch(fetchSaleKGC({
       ...params,
       search: params.search === 'date range' ? null : params.search,
@@ -97,11 +112,31 @@ export default function Dashboard() {
   const loading = stats.loading
   const stakePaginate = stakeRewards.data?.paginate || {}
   const salePaginate  = saleKGC.data?.paginate || {}
-  // Server field aliases
   const stakeTotal = stakeRewards.data?.totalCount ?? stakePaginate.totalItems ?? 0
   const saleTotal  = saleKGC.data?.totalCount ?? salePaginate.totalItems ?? 0
 
-  
+  const filterPeriodLabel =
+    params.search === 'daily'
+      ? 'Today'
+      : params.search === 'all'
+      ? 'All Time'
+      : params.search === 'weekly'
+      ? 'This Week'
+      : params.search === 'monthly'
+      ? 'This Month'
+      : 'Period'
+
+  const activitySubtitle =
+    params.search === 'daily'
+      ? "Today's"
+      : params.search === 'all'
+      ? 'All time'
+      : params.search === 'weekly'
+      ? "This week's"
+      : params.search === 'monthly'
+      ? "This month's"
+      : 'Selected period'
+
   return (
     <div className="space-y-5 sm:space-y-6">
       {/* Header + filter — stack on mobile */}
@@ -124,18 +159,18 @@ export default function Dashboard() {
         {[
           { title: 'Total Users', value: d?.totalusers ?? '-', icon: Users, color: 'primary' },
           {
-            title: `Global Turnover ${params.search === 'daily' ? 'Today' : (params.search ?? '')} ${CURRENCY_SYMBOL}`,
-            value: d?.totalGlobal ? roundTo(d.totalGlobal, ROUND_OFF_TO) : '-',
+            title: `Global Turnover ${filterPeriodLabel} ${CURRENCY_SYMBOL}`,
+            value: d?.totalGlobal != null ? roundTo(d.totalGlobal, ROUND_OFF_TO) : '-',
             icon: RefreshCcw, color: 'success',
           },
           {
             title: `Staking Rewards ${CURRENCY_SYMBOL}`,
-            value: d?.totalUserStake?.totalAmount ? roundTo(d.totalUserStake.totalAmount, ROUND_OFF_TO) : '-',
+            value: d?.totalUserStake?.totalAmount != null ? roundTo(d.totalUserStake.totalAmount, ROUND_OFF_TO) : '-',
             icon: TrendingUp, color: 'info',
           },
           {
             title: `Rewards Distributed ${CURRENCY_SYMBOL}`,
-            value: d?.totalRewardDistribute?.totalAmount ? roundTo(d.totalRewardDistribute.totalAmount, ROUND_OFF_TO) : '-',
+            value: d?.totalRewardDistribute?.totalAmount != null ? roundTo(d.totalRewardDistribute.totalAmount, ROUND_OFF_TO) : '-',
             icon: Gift, color: 'warning',
           },
         ].map((card) => (
@@ -149,7 +184,7 @@ export default function Dashboard() {
       <Card>
         <CardHeader
           title="Stake Rewards"
-          subtitle={`${params.search === 'daily' ? "Today's" : ''} staking activity`}
+          subtitle={`${activitySubtitle} staking activity`}
           actions={
             <SearchInput value={stakeSearch} onChange={handleStakeSearch} placeholder="Search username…" />
           }
@@ -170,7 +205,7 @@ export default function Dashboard() {
       <Card>
         <CardHeader
           title="Token Sales"
-          subtitle={`${params.search === 'daily' ? "Today's" : ''} BW token sales`}
+          subtitle={`${activitySubtitle} BW token sales`}
           actions={
             <SearchInput value={saleSearch} onChange={handleSaleSearch} placeholder="Search username…" />
           }

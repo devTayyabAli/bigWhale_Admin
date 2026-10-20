@@ -68,6 +68,7 @@ const NavItem = memo(function NavItem({ item, collapsed, mobileOpen, onNavigate 
                   <NavLink
                     key={child.id}
                     to={child.path}
+                    end
                     onClick={onNavigate}
                     className={({ isActive: a }) => `nav-item text-sm ${a ? 'active' : ''}`}
                   >

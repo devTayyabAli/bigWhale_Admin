@@ -7,9 +7,10 @@ export const ROUND_OFF_TO = 4
 /** 1 USDC reference value */
 export const ONE_USDC = 1
 
-/** Staking limits */
-export const STAKE_MIN = 50
-export const STAKE_MAX = 500_000
+/** 2X Fast-Track stake is a fixed 5 BW */
+export const STAKE_AMOUNT = 5
+export const STAKE_MIN = 5
+export const STAKE_MAX = 5
 
 /** Supported chain IDs */
 export const CHAIN_IDS = {
@@ -26,16 +27,19 @@ export const USER_STATUS_OPTIONS = ['all', 'pending', 'active', 'banned']
 /** Gift reward status options */
 export const GIFT_STATUS_OPTIONS = ['all', 'pending', 'accepted', 'rejected']
 
-/** Star reward options */
+/**
+ * Gift filter values stay the stored rank titles ("1 star reward") so the
+ * API lookup keeps working. Labels are the 2X Fast-Track rank names.
+ */
 export const STAR_REWARD_OPTIONS = [
-  'all',
-  '1 star reward',
-  '2 star reward',
-  '3 star reward',
-  '4 star reward',
-  '5 star reward',
-  '6 star reward',
-  '7 star reward',
+  { value: 'all', label: 'All' },
+  { value: '1 star reward', label: 'Rank 1 – Bronze Leader' },
+  { value: '2 star reward', label: 'Rank 2 – Silver Leader' },
+  { value: '3 star reward', label: 'Rank 3 – Gold Leader' },
+  { value: '4 star reward', label: 'Rank 4 – Platinum Leader' },
+  { value: '5 star reward', label: 'Rank 5 – Diamond Leader' },
+  { value: '6 star reward', label: 'Rank 6 – Crown Leader' },
+  { value: '7 star reward', label: 'Rank 7 – BigWhale Legend' },
 ]
 
 /** Navigation config — single source of truth */
@@ -51,6 +55,16 @@ export const NAV_ITEMS = [
     title: 'Users',
     icon: 'Users',
     path: '/users/all-users',
+  },
+  {
+    id: 'fast-track',
+    title: '2X Fast-Track',
+    icon: 'Zap',
+    children: [
+      { id: 'fast-track-overview', title: 'Overview', icon: 'Activity', path: '/fast-track' },
+      { id: 'fast-track-withdrawals', title: 'Withdrawals', icon: 'DollarSign', path: '/fast-track/withdrawals' },
+      { id: 'fast-track-settings', title: 'Rank Settings', icon: 'Sliders', path: '/fast-track/settings' },
+    ],
   },
   {
     id: 'gift-rewards',

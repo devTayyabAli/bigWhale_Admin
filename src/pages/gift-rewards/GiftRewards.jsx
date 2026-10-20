@@ -115,7 +115,7 @@ export default function GiftRewards() {
             /* Responsive filter row — wraps on mobile */
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
               <Select
-                options={STAR_REWARD_OPTIONS.map((o) => ({ value: o, label: capitalizeWords(o) }))}
+                options={STAR_REWARD_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
                 value={params.starReward}
                 onChange={(e) => setParams((p) => ({ ...p, starReward: e.target.value, page: 1 }))}
                 className="w-full sm:w-36"

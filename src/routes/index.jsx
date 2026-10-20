@@ -30,6 +30,9 @@ const Banner         = lazy(() => import('@/pages/banner/Banner'))
 const SupportTickets   = lazy(() => import('@/pages/support/SupportTickets'))
 const TicketView       = lazy(() => import('@/pages/support/TicketView'))
 const WhatsAppSettings = lazy(() => import('@/pages/whatsapp-settings/WhatsAppSettings'))
+const FastTrackOverview = lazy(() => import('@/pages/fast-track/FastTrackOverview'))
+const FastTrackSettings = lazy(() => import('@/pages/fast-track/FastTrackSettings'))
+const FastTrackWithdrawals = lazy(() => import('@/pages/fast-track/FastTrackWithdrawals'))
 const NotFound         = lazy(() => import('@/pages/misc/NotFound'))
 
 // ─── Route tree ───────────────────────────────────────────────────────────────
@@ -83,6 +86,11 @@ export default function AppRoutes() {
           {/* Support */}
           <Route path="/support-history" element={<SupportTickets />} />
           <Route path="/support/ticket-details/:id" element={<TicketView />} />
+
+          {/* 2X Fast-Track */}
+          <Route path="/fast-track" element={<FastTrackOverview />} />
+          <Route path="/fast-track/withdrawals" element={<FastTrackWithdrawals />} />
+          <Route path="/fast-track/settings" element={<FastTrackSettings />} />
 
           {/* Settings */}
           <Route path="/whatsapp-settings" element={<WhatsAppSettings />} />

@@ -28,6 +28,16 @@ const COLUMNS = [
     render: (r) => roundTo(r.amount, ROUND_OFF_TO),
   },
   {
+    key: 'joinings',
+    header: 'Joinings',
+    render: (r) => (r.payoutPercentage === 80 ? (r.requiredJoinings ?? 1) : '-'),
+  },
+  {
+    key: 'quota',
+    header: 'Quota',
+    render: (r) => (r.payoutPercentage === 80 ? (r.fastTrackQuotaConsumedAt ? 'Consumed' : 'Pending') : '-'),
+  },
+  {
     key: 'walletAddress',
     header: 'Wallet',
     render: (r) => truncateAddress(r?.userId?.walletAddress),

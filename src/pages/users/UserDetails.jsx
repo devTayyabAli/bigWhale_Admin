@@ -23,6 +23,7 @@ import { SkeletonCard } from '@/components/ui/Skeleton'
 import { CURRENCY_SYMBOL, ROUND_OFF_TO } from '@/constants'
 import { formatDate, roundTo, truncateAddress, formatRewardType } from '@/utils'
 import { staggerContainer, staggerItem } from '@/animations'
+import FastTrackCard from './FastTrackCard'
 
 const TABS = ['Staking', 'Rewards', 'Withdrawals', 'Sales', 'Fund Transfers']
 
@@ -89,6 +90,8 @@ export default function UserDetails() {
       state: withdrawals,
       columns: [
         { key: 'amount', header: `USDT ${CURRENCY_SYMBOL}`, render: (r) => roundTo(r?.amount ?? r?.withdrawAmount ?? 0, ROUND_OFF_TO) },
+        { key: 'joinings', header: 'Joinings', render: (r) => r?.requiredJoinings ?? '-' },
+        { key: 'quota', header: 'Quota', render: (r) => r?.fastTrackQuotaConsumedAt ? 'Consumed' : (r?.payoutPercentage === 80 ? 'Pending' : '-') },
         { key: 'walletAddress', header: 'Wallet',           render: (r) => truncateAddress(r?.walletAddress || r?.address) },
         { key: 'status', header: 'Status',                  render: (r) => <Badge status={r?.status || 'Pending'} /> },
         { key: 'createdAt', header: 'Date',                 render: (r) => formatDate(r?.createdAt || r?.date) },
@@ -191,6 +194,9 @@ export default function UserDetails() {
           </motion.div>
         </motion.div>
       )}
+
+      {/* 2X Fast-Track status + admin actions */}
+      <FastTrackCard userId={id} />
 
       {/* Tabs — horizontally scrollable on mobile */}
       <Card>

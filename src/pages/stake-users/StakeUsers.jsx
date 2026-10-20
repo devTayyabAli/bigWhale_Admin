@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
 import { TrendingUp, AlertCircle, Info } from 'react-feather'
@@ -11,7 +11,7 @@ import Button from '@/components/ui/Button'
 import PageHeader from '@/components/ui/PageHeader'
 import { useWallet } from '@/context/WalletProvider'
 import { stakeKGC, completeStake, activateStake } from '@/services/staking'
-import { STAKE_MIN, STAKE_MAX } from '@/constants'
+import { STAKE_AMOUNT } from '@/constants'
 import { useDebounce } from '@/hooks/useDebounce'
 import { fadeInUp } from '@/animations'
 
@@ -25,7 +25,6 @@ export default function StakeUsers() {
   // and avoids window.ethereum which can be hijacked by Phantom / other extensions.
   const { data: walletClient } = useWalletClient()
 
-  const [amount, setAmount]             = useState('')
   const [bwPrice, setBwPrice]           = useState(0)
   const [priceLoading, setPriceLoading] = useState(true)
   const [selectedUser, setSelectedUser] = useState(null)
@@ -33,7 +32,6 @@ export default function StakeUsers() {
   const [showDropdown, setShowDropdown] = useState(false)
   const [loading, setLoading]           = useState(false)
   const [walletError, setWalletError]   = useState(false)
-  const [amountError, setAmountError]   = useState('')
   const [stakeTokensFn, setStakeTokensFn] = useState(null)
 
   const debouncedSearch = useDebounce(userSearch, 300)
@@ -55,31 +53,20 @@ export default function StakeUsers() {
       .finally(() => setPriceLoading(false))
   }, [])
 
-  // BW tokens = usdAmount / pricePerToken  (pure local math, instant)
+  // 2X Fast-Track stake is fixed at STAKE_AMOUNT USD. BW tokens follow the live price.
   const bwTokens = (() => {
-    const usd   = parseFloat(amount)
     const price = parseFloat(bwPrice)
-    if (!usd || !price || price === 0) return 0
-    return usd / price
+    if (!price) return 0
+    return STAKE_AMOUNT / price
   })()
 
   useEffect(() => {
     dispatch(fetchAllUsers({ page: 1, limit: 40, search: debouncedSearch || null, status: 'active' }))
   }, [dispatch, debouncedSearch])
 
-  const handleAmountChange = useCallback((e) => {
-    const val = e.target.value
-    if (val !== '' && parseFloat(val) > STAKE_MAX) {
-      setAmountError(`Maximum is $${STAKE_MAX.toLocaleString()}`)
-    } else {
-      setAmountError('')
-    }
-    setAmount(val)
-  }, [])
-
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (parseFloat(amount) < STAKE_MIN) { setAmountError(`Minimum stake is $${STAKE_MIN}`); return }
+    if (!bwTokens) { toast.error('BW price is not available yet'); return }
     if (!selectedUser) { toast.error('Please select a user'); return }
     if (!walletClient) { toast.error('Please connect your wallet first'); return }
 
@@ -91,9 +78,13 @@ export default function StakeUsers() {
       setWalletError(false)
       setLoading(true)
 
-      // Create pending stake record — stake.amount = USDT fiat value
-      // (used by the reward cron to calculate daily rewards)
-      const stakeRes = await stakeKGC({ userId: selectedUser._id, amount: Number(amount) })
+      // fiatAmount is the fixed 5 BW rule the server enforces; amount is the
+      // token quantity that will actually be transferred on-chain.
+      const stakeRes = await stakeKGC({
+        userId: selectedUser._id,
+        amount: Number(bwTokens),
+        fiatAmount: STAKE_AMOUNT,
+      })
       const stakeId  = stakeRes?.data?.data?._id
 
       if (stakeTokensFn) {
@@ -114,7 +105,7 @@ export default function StakeUsers() {
               data: {
                 userId:       selectedUser._id,
                 txHash,
-                fiatAmount:   Number(amount),
+                fiatAmount:   STAKE_AMOUNT,
                 cryptoAmount: Number(bwTokens),
               },
             })
@@ -131,7 +122,6 @@ export default function StakeUsers() {
             }
             setLoading(false)
             toast.success('Stake completed successfully')
-            setAmount('')
             setSelectedUser(null)
             setUserSearch('')
           },
@@ -140,7 +130,6 @@ export default function StakeUsers() {
       } else {
         setLoading(false)
         toast.success('Stake record created')
-        setAmount('')
         setSelectedUser(null)
       }
     } catch (err) {
@@ -161,18 +150,14 @@ export default function StakeUsers() {
           <CardBody>
             <form onSubmit={handleSubmit} className="space-y-4" noValidate>
 
-              {/* Amount */}
-              <Input
-                label="Stake Amount ($)"
-                type="number"
-                inputMode="decimal"
-                step="any"
-                placeholder={`Min $${STAKE_MIN} — Max $${STAKE_MAX.toLocaleString()}`}
-                value={amount}
-                onChange={handleAmountChange}
-                error={amountError}
-                disabled={loading}
-              />
+              {/* Fixed 5 BW stake */}
+              <div className="flex items-center justify-between p-3 rounded-xl bg-bw-primary/10 border border-bw-primary/30">
+                <div>
+                  <p className="text-sm font-semibold text-bw-text">2X Fast-Track Stake</p>
+                  <p className="text-xs text-bw-muted mt-0.5">Fixed amount — the only stake the plan accepts</p>
+                </div>
+                <span className="text-bw-primary font-bold">${STAKE_AMOUNT} BW</span>
+              </div>
 
               {/* BW tokens preview — computed from contract price */}
               <div className="flex items-center justify-between p-3 rounded-xl bg-bw-surface border border-bw-border">
@@ -223,13 +208,13 @@ export default function StakeUsers() {
                 )}
               </div>
 
-              {/* Limits info */}
+              {/* Plan info */}
               <div className="flex items-start gap-2 p-3 rounded-xl bg-bw-primary/5 border border-bw-primary/20 text-xs text-bw-muted">
                 <Info size={13} className="text-bw-primary mt-0.5 flex-shrink-0" />
-                <div className="space-y-0.5">
-                  <p>Minimum: <span className="text-bw-text font-medium">${STAKE_MIN}</span></p>
-                  <p>Maximum: <span className="text-bw-text font-medium">${STAKE_MAX.toLocaleString()}</span></p>
-                </div>
+                <p>
+                  Pays <span className="text-bw-text font-medium">10 BW once</span>, 24 hours after the
+                  stake is confirmed, and only once the user has 5 staked directs. Then they re-stake.
+                </p>
               </div>
 
               {walletError && (
@@ -243,9 +228,9 @@ export default function StakeUsers() {
                 type="submit"
                 fullWidth
                 loading={loading}
-                disabled={!amount || parseFloat(amount) < STAKE_MIN || Boolean(amountError) || !selectedUser}
+                disabled={!selectedUser || !bwTokens}
               >
-                {loading ? 'Processing…' : 'Stake Now'}
+                {loading ? 'Processing…' : `Stake ${STAKE_AMOUNT} BW`}
               </Button>
             </form>
           </CardBody>

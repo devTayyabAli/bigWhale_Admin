@@ -2,6 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -46,4 +49,4 @@ export default defineConfig({
       // at runtime when chunks load out of order.
     },
   },
-})
+});

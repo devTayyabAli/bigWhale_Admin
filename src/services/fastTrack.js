@@ -12,7 +12,7 @@ export const getFastTrackStats = () => api.get('/admin/fast-track/stats')
 /** Last admin actions and rank-sync runs. */
 export const getFastTrackAudit = () => api.get('/admin/fast-track/audit')
 
-/** Recompute every sponsor's rank and 2X unlock from staked directs. Promotion only. */
+/** Recompute every sponsor's rank (staked directs) and 2X unlock (all directs). Promotion only. */
 export const resyncAllRanks = () => api.post('/admin/fast-track/resync')
 
 /** Set every rank to exactly the staked-direct qualification. Can clear old ranks. */

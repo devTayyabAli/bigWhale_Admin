@@ -151,7 +151,7 @@ export default function FastTrackOverview() {
       </div>
 
       <Card>
-        <CardHeader title="Unlock Funnel" subtitle="Users who still have fewer than 5 staked directs" />
+        <CardHeader title="Unlock Funnel" subtitle="Users who still have fewer than 5 directs" />
         <CardBody>
           <div className="grid grid-cols-5 gap-2 text-center">
             {[0, 1, 2, 3, 4].map((n) => (
@@ -200,7 +200,7 @@ export default function FastTrackOverview() {
       {resetOpen && (
         <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 space-y-3">
           <p className="text-sm text-red-300">
-            This sets every user rank and 2X unlock to exactly what their staked directs qualify
+            This sets every user rank (staked directs) and 2X unlock (all directs) to exactly what they qualify
             them for. Old turnover ranks that no longer qualify are cleared and this cannot be undone.
           </p>
           <input
@@ -228,7 +228,7 @@ export default function FastTrackOverview() {
         confirmVariant="primary"
         confirmLabel="Run Sync"
         title="Re-sync all ranks?"
-        message="Every sponsor's rank and 2X unlock will be recomputed from their staked directs. Ranks only move up."
+        message="Every sponsor's rank (staked directs) and 2X unlock (all directs) will be recomputed. Ranks only move up."
       />
     </motion.div>
   )

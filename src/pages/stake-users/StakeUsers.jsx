@@ -213,7 +213,7 @@ export default function StakeUsers() {
                 <Info size={13} className="text-bw-primary mt-0.5 flex-shrink-0" />
                 <p>
                   Pays <span className="text-bw-text font-medium">10 BW once</span>, 24 hours after the
-                  stake is confirmed, and only once the user has 5 staked directs. Then they re-stake.
+                  stake is confirmed, and only once the user has 5 directs (staked or not). Then they re-stake.
                 </p>
               </div>
 

@@ -111,7 +111,7 @@ export default function FastTrackSettings() {
       <Card>
         <CardHeader
           title="Ranks 1 – 7"
-          subtitle={rules ? `2X unlocks at ${rules.unlockDirects} staked directs · stake is fixed at ${rules.stakeAmount} BW` : ''}
+          subtitle={rules ? `2X unlocks at ${rules.unlockDirects} directs (staked or not) · stake is fixed at ${rules.stakeAmount} BW` : ''}
         />
         <CardBody className="p-0 overflow-x-auto">
           <table className="w-full text-sm min-w-[640px]">

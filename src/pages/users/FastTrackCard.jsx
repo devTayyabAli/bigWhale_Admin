@@ -88,7 +88,8 @@ export default function FastTrackCard({ userId }) {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {[
                 ['2X Status', unlocked ? 'Unlocked' : 'Locked'],
-                ['Staked Directs', `${data?.stakedDirects ?? 0} / ${data?.unlockTarget ?? 5}`],
+                ['Directs (2X unlock)', `${data?.activeDirects ?? 0} / ${data?.unlockTarget ?? 5}`],
+                ['Staked Directs (rank)', data?.stakedDirects ?? 0],
                 ['Rank', u?.userRankId ? `Rank ${u.userRankId}${data?.rankTitle ? ` · ${data.rankTitle}` : ''}` : 'None'],
                 ['Next Rank At', data?.nextRankTarget ? `${data.nextRankTarget} directs` : 'Top rank'],
                 ['Withdrawal Credits', u?.unusedDirectCount ?? 0],

@@ -22,8 +22,8 @@ jobs:
 
               echo "=== Pulling latest code ==="
               cd /home/apps/BigWhale/bigWhale_Admin
-              git checkout -- .
-              git pull origin main
+              git fetch origin
+              git reset --hard origin/main
 
               echo "=== Building and restarting containers ==="
               cd /home/apps/BigWhale
